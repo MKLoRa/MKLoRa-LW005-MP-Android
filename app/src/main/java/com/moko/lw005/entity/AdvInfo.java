@@ -5,14 +5,15 @@ public class AdvInfo {
     public int deviceType;
     public int rssi;
     public String mac;
-    public int battery;
-    public int powerState;
+
     public long scanTime;
     public long intervalTime;
     public int txPower;
-    public String uuid;
-    public int major;
-    public int minor;
-    public int measurePower;
     public boolean connectable;
+    public int voltage;
+    public int current;
+    public int power;
+    public int powerFactor;
+    public int currentRate;
+    public int loadState;
 }

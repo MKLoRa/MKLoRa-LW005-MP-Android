@@ -20,8 +20,7 @@ import butterknife.ButterKnife;
 
 public class GeneralFragment extends Fragment {
     private static final String TAG = GeneralFragment.class.getSimpleName();
-    @BindView(R2.id.et_heartbeat_interval)
-    EditText etHeartbeatInterval;
+
 
 
     private DeviceInfoActivity activity;
@@ -43,25 +42,5 @@ public class GeneralFragment extends Fragment {
         ButterKnife.bind(this, view);
         activity = (DeviceInfoActivity) getActivity();
         return view;
-    }
-    public void setHeartbeatInterval(int interval) {
-        etHeartbeatInterval.setText(String.valueOf(interval));
-    }
-
-    public boolean isValid() {
-        final String intervalStr = etHeartbeatInterval.getText().toString();
-        if (TextUtils.isEmpty(intervalStr))
-            return false;
-        final int interval = Integer.parseInt(intervalStr);
-        if (interval < 300 || interval > 86400) {
-            return false;
-        }
-        return true;
-    }
-
-    public void saveParams() {
-        final String intervalStr = etHeartbeatInterval.getText().toString();
-        final int interval = Integer.parseInt(intervalStr);
-        LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setHeartBeatInterval(interval));
     }
 }

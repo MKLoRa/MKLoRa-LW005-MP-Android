@@ -23,20 +23,20 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.AppConstants;
 import com.moko.lw005.R;
 import com.moko.lw005.R2;
 import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.ChangePasswordDialog;
 import com.moko.lw005.dialog.LoadingMessageDialog;
+import com.moko.lw005.fragment.BleFragment;
 import com.moko.lw005.fragment.DeviceFragment;
 import com.moko.lw005.fragment.GeneralFragment;
 import com.moko.lw005.fragment.LoRaFragment;
-import com.moko.lw005.fragment.PositionFragment;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
+import com.moko.support.lw005.entity.ControlKeyEnum;
 import com.moko.support.lw005.entity.OrderCHAR;
 import com.moko.support.lw005.entity.ParamsKeyEnum;
 
@@ -60,10 +60,10 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     FrameLayout frameContainer;
     @BindView(R2.id.radioBtn_lora)
     RadioButton radioBtnLora;
-    @BindView(R2.id.radioBtn_position)
-    RadioButton radioBtnPosition;
     @BindView(R2.id.radioBtn_general)
     RadioButton radioBtnGeneral;
+    @BindView(R2.id.radioBtn_ble)
+    RadioButton radioBtnBle;
     @BindView(R2.id.radioBtn_device)
     RadioButton radioBtnDevice;
     @BindView(R2.id.rg_options)
@@ -74,11 +74,12 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     ImageView ivSave;
     private FragmentManager fragmentManager;
     private LoRaFragment loraFragment;
-    private PositionFragment posFragment;
+    private BleFragment bleFragment;
     private GeneralFragment generalFragment;
     private DeviceFragment deviceFragment;
     private ArrayList<String> mUploadMode;
     private ArrayList<String> mRegions;
+    private ArrayList<String> mClass;
     private int mSelectedRegion;
     private int mSelectUploadMode;
     private boolean mReceiverTag = false;
@@ -111,6 +112,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         mRegions.add("IN865");
         mRegions.add("US915");
         mRegions.add("RU864");
+        mClass = new ArrayList<>();
+        mClass.add("Class A");
+        mClass.add("Class C");
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -124,8 +128,9 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             // sync time after connect success;
             orderTasks.add(OrderTaskAssembler.setTime());
             // get lora params
-            orderTasks.add(OrderTaskAssembler.getLoraRegion());
             orderTasks.add(OrderTaskAssembler.getLoraUploadMode());
+            orderTasks.add(OrderTaskAssembler.getLoraRegion());
+            orderTasks.add(OrderTaskAssembler.getLoraClass());
             orderTasks.add(OrderTaskAssembler.getLoraNetworkStatus());
             LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }
@@ -133,17 +138,17 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     private void initFragment() {
         loraFragment = LoRaFragment.newInstance();
-        posFragment = PositionFragment.newInstance();
         generalFragment = GeneralFragment.newInstance();
+        bleFragment = BleFragment.newInstance();
         deviceFragment = DeviceFragment.newInstance();
         fragmentManager.beginTransaction()
                 .add(R.id.frame_container, loraFragment)
-                .add(R.id.frame_container, posFragment)
                 .add(R.id.frame_container, generalFragment)
+                .add(R.id.frame_container, bleFragment)
                 .add(R.id.frame_container, deviceFragment)
                 .show(loraFragment)
-                .hide(posFragment)
                 .hide(generalFragment)
+                .hide(bleFragment)
                 .hide(deviceFragment)
                 .commit();
     }
@@ -198,6 +203,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 // no data exchange timeout
                             } else if (type == 4) {
                                 // reset success
+                            } else if (type == 5) {
+                                // change unconnectable
                             }
                         }
                         break;
@@ -214,6 +221,42 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 switch (orderCHAR) {
+                    case CHAR_CONTROL:
+                        if (value.length >= 4) {
+                            int header = value[0] & 0xFF;// 0xED
+                            int flag = value[1] & 0xFF;// read or write
+                            int cmd = value[2] & 0xFF;
+                            if (header != 0xED)
+                                return;
+                            ControlKeyEnum configKeyEnum = ControlKeyEnum.fromParamKey(cmd);
+                            if (configKeyEnum == null) {
+                                return;
+                            }
+                            int length = value[3] & 0xFF;
+                            if (flag == 0x01) {
+                                // write
+                                int result = value[4] & 0xFF;
+                                switch (configKeyEnum) {
+                                    case KEY_TIME:
+                                        if (result == 1)
+                                            ToastUtils.showToast(DeviceInfoActivity.this, "Time sync completed!");
+                                        break;
+                                }
+                            }
+                            if (flag == 0x00) {
+                                // read
+                                switch (configKeyEnum) {
+                                    case KEY_NETWORK_STATUS:
+                                        if (length > 0) {
+                                            int networkStatus = value[4] & 0xFF;
+                                            loraFragment.setLoraStatus(networkStatus);
+                                        }
+                                        break;
+                                }
+                            }
+
+                        }
+                        break;
                     case CHAR_PARAMS:
                         if (value.length >= 4) {
                             int header = value[0] & 0xFF;// 0xED
@@ -230,15 +273,15 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                 // write
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
-                                    case KEY_TIME:
-                                        if (result == 1)
-                                            ToastUtils.showToast(DeviceInfoActivity.this, "Time sync completed!");
+                                    case KEY_BLE_ADV_NAME:
+                                    case KEY_BLE_ADV_INTERVAL:
+                                    case KEY_BLE_TX_POWER:
+                                    case KEY_BLE_CONNECTABLE:
+                                        if (result != 1) {
+                                            savedParamsError = true;
+                                        }
                                         break;
-                                    case KEY_OFFLINE_LOCATION:
-                                    case KEY_HEARTBEAT_INTERVAL:
-                                    case KEY_TIME_ZONE:
-                                    case KEY_SHUTDOWN_INFO_REPORT:
-                                    case KEY_LOW_POWER:
+                                    case KEY_BLE_LOGIN_MODE:
                                         if (result != 1) {
                                             savedParamsError = true;
                                         }
@@ -267,46 +310,52 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                         if (length > 0) {
                                             final int mode = value[4];
                                             mSelectUploadMode = mode;
-                                            String loraInfo = String.format("%s/%s/ClassA",
+                                        }
+                                        break;
+                                    case KEY_LORA_CLASS:
+                                        if (length > 0) {
+                                            final int loraClass = value[4] & 0xff;
+                                            String loraInfo = String.format("%s/%s/%s",
                                                     mUploadMode.get(mSelectUploadMode - 1),
-                                                    mRegions.get(mSelectedRegion));
+                                                    mRegions.get(mSelectedRegion),
+                                                    loraClass == 0 ? mClass.get(loraClass) : mClass.get(loraClass - 1));
                                             loraFragment.setLoRaInfo(loraInfo);
                                         }
                                         break;
-                                    case KEY_NETWORK_STATUS:
+                                    case KEY_BLE_ADV_NAME:
                                         if (length > 0) {
-                                            int networkStatus = value[4] & 0xFF;
-                                            loraFragment.setLoraStatus(networkStatus);
+                                            String advName = new String(Arrays.copyOfRange(value, 4, 4 + length));
+                                            bleFragment.setBleAdvName(advName);
                                         }
                                         break;
-                                    case KEY_OFFLINE_LOCATION:
+                                    case KEY_BLE_ADV_INTERVAL:
                                         if (length > 0) {
-                                            int enable = value[4] & 0xFF;
-                                            posFragment.setOfflineFix(enable);
+                                            int advInterval = value[4] & 0xFF;
+                                            bleFragment.setBleAdvInterval(advInterval);
                                         }
                                         break;
-                                    case KEY_HEARTBEAT_INTERVAL:
+                                    case KEY_BLE_CONNECTABLE:
                                         if (length > 0) {
-                                            byte[] intervalBytes = Arrays.copyOfRange(value, 4, 4 + length);
-                                            generalFragment.setHeartbeatInterval(MokoUtils.toInt(intervalBytes));
+                                            int connectable = value[4] & 0xFF;
+                                            bleFragment.setBleConnectable(connectable);
+                                        }
+                                        break;
+                                    case KEY_BLE_LOGIN_MODE:
+                                        if (length > 0) {
+                                            int loginMode = value[4] & 0xFF;
+                                            bleFragment.setBleLoginMode(loginMode);
+                                        }
+                                        break;
+                                    case KEY_BLE_TX_POWER:
+                                        if (length > 0) {
+                                            int txPower = value[4];
+                                            bleFragment.setBleTxPower(txPower);
                                         }
                                         break;
                                     case KEY_TIME_ZONE:
                                         if (length > 0) {
                                             int timeZone = value[4];
                                             deviceFragment.setTimeZone(timeZone);
-                                        }
-                                        break;
-                                    case KEY_SHUTDOWN_INFO_REPORT:
-                                        if (length > 0) {
-                                            int enable = value[4] & 0xFF;
-                                            deviceFragment.setShutdownPayload(enable);
-                                        }
-                                        break;
-                                    case KEY_LOW_POWER:
-                                        if (length > 0) {
-                                            int lowPower = value[4] & 0xFF;
-                                            deviceFragment.setLowPower(lowPower);
                                         }
                                         break;
                                 }
@@ -343,8 +392,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             dialog.show(getSupportFragmentManager());
         } else if (disConnectType == 4) {
             AlertMessageDialog dialog = new AlertMessageDialog();
-            dialog.setTitle("Reset Successfully");
-            dialog.setMessage("Reset successfully!Please reconnect the device.");
+            dialog.setTitle("Factory Reset");
+            dialog.setMessage("Factory reset successfully!\nPlease reconnect the device.");
             dialog.setConfirm("OK");
             dialog.setCancelGone();
             dialog.setOnAlertConfirmListener(() -> {
@@ -415,7 +464,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == AppConstants.REQUEST_CODE_LORA_CONN_SETTING) {
             if (resultCode == RESULT_OK) {
-                ivSave.postDelayed(() -> {
+                tvTitle.postDelayed(() -> {
                     showSyncingProgressDialog();
                     List<OrderTask> orderTasks = new ArrayList<>();
                     // setting
@@ -477,10 +526,10 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void onSave(View view) {
         if (isWindowLocked())
             return;
-        if (radioBtnGeneral.isChecked()) {
-            if (generalFragment.isValid()) {
+        if (radioBtnBle.isChecked()) {
+            if (bleFragment.isValid()) {
                 showSyncingProgressDialog();
-                generalFragment.saveParams();
+                bleFragment.saveParams();
             } else {
                 ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
             }
@@ -505,10 +554,10 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void onCheckedChanged(RadioGroup group, @IdRes int checkedId) {
         if (checkedId == R.id.radioBtn_lora) {
             showLoRaAndGetData();
-        } else if (checkedId == R.id.radioBtn_position) {
-            showPosAndGetData();
         } else if (checkedId == R.id.radioBtn_general) {
             showGeneralAndGetData();
+        } else if (checkedId == R.id.radioBtn_ble) {
+            showBleAndGetData();
         } else if (checkedId == R.id.radioBtn_device) {
             showDeviceAndGetData();
         }
@@ -519,43 +568,46 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         ivSave.setVisibility(View.GONE);
         fragmentManager.beginTransaction()
                 .hide(loraFragment)
-                .hide(posFragment)
                 .hide(generalFragment)
+                .hide(bleFragment)
                 .show(deviceFragment)
                 .commit();
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         // device
         orderTasks.add(OrderTaskAssembler.getTimeZone());
-        orderTasks.add(OrderTaskAssembler.getShutdownInfoReport());
-        orderTasks.add(OrderTaskAssembler.getLowPower());
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private void showGeneralAndGetData() {
         tvTitle.setText("General Settings");
-        ivSave.setVisibility(View.VISIBLE);
-        fragmentManager.beginTransaction()
-                .hide(loraFragment)
-                .hide(posFragment)
-                .show(generalFragment)
-                .hide(deviceFragment)
-                .commit();
-        showSyncingProgressDialog();
-        LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getHeartBeatInterval());
-    }
-
-    private void showPosAndGetData() {
-        tvTitle.setText("Positioning Strategy");
         ivSave.setVisibility(View.GONE);
         fragmentManager.beginTransaction()
                 .hide(loraFragment)
-                .show(posFragment)
+                .show(generalFragment)
+                .hide(bleFragment)
+                .hide(deviceFragment)
+                .commit();
+    }
+
+    private void showBleAndGetData() {
+        tvTitle.setText("Bluetooth Settings");
+        ivSave.setVisibility(View.GONE);
+        fragmentManager.beginTransaction()
+                .hide(loraFragment)
                 .hide(generalFragment)
+                .show(bleFragment)
                 .hide(deviceFragment)
                 .commit();
         showSyncingProgressDialog();
-        LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.getOfflineLocation());
+        List<OrderTask> orderTasks = new ArrayList<>();
+        // get ble params
+        orderTasks.add(OrderTaskAssembler.getBleAdvName());
+        orderTasks.add(OrderTaskAssembler.getBleAdvInterval());
+        orderTasks.add(OrderTaskAssembler.getBleConnectable());
+        orderTasks.add(OrderTaskAssembler.getBleLoginMode());
+        orderTasks.add(OrderTaskAssembler.getBleTxPower());
+        LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
     private void showLoRaAndGetData() {
@@ -563,8 +615,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         ivSave.setVisibility(View.GONE);
         fragmentManager.beginTransaction()
                 .show(loraFragment)
-                .hide(posFragment)
                 .hide(generalFragment)
+                .hide(bleFragment)
                 .hide(deviceFragment)
                 .commit();
         showSyncingProgressDialog();
@@ -582,7 +634,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         final ChangePasswordDialog dialog = new ChangePasswordDialog(this);
         dialog.setOnPasswordClicked(password -> {
             showSyncingProgressDialog();
-            LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.changePassword(password));
+            LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setNewPassword(password));
         });
         dialog.show();
         Timer timer = new Timer();
@@ -595,6 +647,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         }, 200);
     }
 
+    // lora
     public void onLoRaConnSetting(View view) {
         if (isWindowLocked())
             return;
@@ -609,65 +662,67 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         startActivity(intent);
     }
 
-    public void onWifiFix(View view) {
+    // general
+    public void onSwitchControl(View view) {
         if (isWindowLocked())
             return;
-        Intent intent = new Intent(this, PosWifiFixActivity.class);
+        Intent intent = new Intent(this, SwitchControlActivity.class);
         startActivity(intent);
     }
 
-    public void onBleFix(View view) {
+    public void onElectricitySettings(View view) {
         if (isWindowLocked())
             return;
-        Intent intent = new Intent(this, PosBleFixActivity.class);
+        Intent intent = new Intent(this, ElectricitySettingsActivity.class);
         startActivity(intent);
     }
 
-    public void onGPSFix(View view) {
+    public void onEnergySettings(View view) {
         if (isWindowLocked())
             return;
-        Intent intent = new Intent(this, PosGpsFixActivity.class);
+        Intent intent = new Intent(this, EnergySettingsActivity.class);
         startActivity(intent);
     }
 
-    public void onDeviceMode(View view) {
+    public void onProtectionSettings(View view) {
         if (isWindowLocked())
             return;
-        Intent intent = new Intent(this, DeviceModeActivity.class);
+        Intent intent = new Intent(this, ProtectionSettingsActivity.class);
         startActivity(intent);
     }
 
-    public void onAuxiliaryInterval(View view) {
+    public void onLoadStatusNotification(View view) {
         if (isWindowLocked())
             return;
-        Intent intent = new Intent(this, AuxiliaryOperationActivity.class);
+        Intent intent = new Intent(this, LoadStatusNotificationActivity.class);
         startActivity(intent);
     }
 
-    public void onBleSettings(View view) {
+    public void onCountdownSetting(View view) {
         if (isWindowLocked())
             return;
-        Intent intent = new Intent(this, BleSettingsActivity.class);
+        Intent intent = new Intent(this, CountdownSettingsActivity.class);
         startActivity(intent);
     }
 
-    public void onAxisSettings(View view) {
+    public void onLEDSetting(View view) {
         if (isWindowLocked())
             return;
-        Intent intent = new Intent(this, AxisSettingActivity.class);
+        Intent intent = new Intent(this, LEDSettingsActivity.class);
         startActivity(intent);
     }
 
-    public void onLocalDataSync(View view) {
+    // ble
+    public void onConnectable(View view) {
         if (isWindowLocked())
             return;
-        startActivity(new Intent(this, ExportDataActivity.class));
+        bleFragment.changeConnectable();
     }
 
-    public void onIndicatorSettings(View view) {
+    public void onChangeLoginMode(View view) {
         if (isWindowLocked())
             return;
-        startActivity(new Intent(this, IndicatorSettingsActivity.class));
+        bleFragment.changeLoginMode();
     }
 
     public void selectTimeZone(View view) {
@@ -676,18 +731,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         deviceFragment.showTimeZoneDialog();
     }
 
-    public void onOnOff(View view) {
-        if (isWindowLocked())
-            return;
-        startActivity(new Intent(this, OnOffActivity.class));
-    }
-
-    public void selectLowPowerPrompt(View view) {
-        if (isWindowLocked())
-            return;
-        deviceFragment.showLowPowerDialog();
-    }
-
+    // device
     public void onDeviceInfo(View view) {
         if (isWindowLocked())
             return;
@@ -706,37 +750,5 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.restore());
         });
         dialog.show(getSupportFragmentManager());
-    }
-
-    public void onPowerOff(View view) {
-        if (isWindowLocked())
-            return;
-        AlertMessageDialog dialog = new AlertMessageDialog();
-        dialog.setTitle("Warning!");
-        dialog.setMessage("Are you sure to turn off the device? Please make sure the device has a button to turn on!");
-        dialog.setConfirm("OK");
-        dialog.setOnAlertConfirmListener(() -> {
-            showSyncingProgressDialog();
-            LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setWorkMode(0));
-        });
-        dialog.show(getSupportFragmentManager());
-    }
-
-    public void onOfflineFix(View view) {
-        if (isWindowLocked())
-            return;
-        posFragment.changeOfflineFix();
-    }
-
-    public void onShutdownPayload(View view) {
-        if (isWindowLocked())
-            return;
-        deviceFragment.changeShutdownPayload();
-    }
-
-    public void onLowPowerPayload(View view) {
-        if (isWindowLocked())
-            return;
-        deviceFragment.changeLowPowerPayload();
     }
 }

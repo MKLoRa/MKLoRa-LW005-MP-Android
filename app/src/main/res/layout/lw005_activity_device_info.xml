@@ -43,7 +43,6 @@
             android:paddingRight="16dp"
             android:src="@drawable/lw005_ic_save"
             android:visibility="gone" />
-
     </RelativeLayout>
 
     <FrameLayout
@@ -84,7 +83,7 @@
 
 
             <RadioButton
-                android:id="@+id/radioBtn_position"
+                android:id="@+id/radioBtn_general"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
@@ -94,22 +93,22 @@
                 android:gravity="center"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:text="@string/title_position"
+                android:text="@string/title_general"
                 android:textColor="@drawable/lw005_selector_option_radiobtn_color"
                 android:textSize="12sp" />
 
             <RadioButton
-                android:id="@+id/radioBtn_general"
+                android:id="@+id/radioBtn_ble"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1.0"
                 android:button="@null"
-                android:drawableTop="@drawable/lw005_selector_general"
+                android:drawableTop="@drawable/lw005_selector_ble"
                 android:drawablePadding="5dp"
                 android:gravity="center"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:text="@string/title_general"
+                android:text="@string/title_ble"
                 android:textColor="@drawable/lw005_selector_option_radiobtn_color"
                 android:textSize="12sp" />
 

@@ -12,7 +12,7 @@
         android:padding="10dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_device_mode"
+            android:id="@+id/cl_switch_control"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/lw005_white_ffffff"
@@ -22,14 +22,14 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/tv_device_mode"
+                android:id="@+id/tv_switch_control"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:clickable="true"
                 android:drawableRight="@drawable/lw005_ic_arrow_right"
                 android:gravity="center_vertical"
-                android:onClick="onDeviceMode"
-                android:text="@string/general_device_mode"
+                android:onClick="onSwitchControl"
+                android:text="@string/general_switch_control"
                 android:textColor="@color/lw005_black_333333"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -40,7 +40,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_auxiliary_interval"
+            android:id="@+id/cl_electricity_settings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -48,17 +48,17 @@
             android:padding="10dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_device_mode">
+            app:layout_constraintTop_toBottomOf="@id/cl_switch_control">
 
             <TextView
-                android:id="@+id/tv_auxiliary_interval"
+                android:id="@+id/tv_electricity_settings"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:clickable="true"
                 android:drawableRight="@drawable/lw005_ic_arrow_right"
                 android:gravity="center_vertical"
-                android:onClick="onAuxiliaryInterval"
-                android:text="@string/general_auxiliary_operation"
+                android:onClick="onElectricitySettings"
+                android:text="@string/general_electricity_settings"
                 android:textColor="@color/lw005_black_333333"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -69,63 +69,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_heartbeat_interval"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/lw005_white_ffffff"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:padding="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_auxiliary_interval">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/general_heartbeat_interval"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/et_heartbeat_interval"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@id/et_heartbeat_interval" />
-
-            <EditText
-                android:id="@+id/et_heartbeat_interval"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:hint="300~86400"
-                android:inputType="number"
-                android:maxLength="5"
-                android:text=""
-                android:textColor="@color/lw005_black_333333"
-                android:textColorHint="@color/lw005_grey_ebebeb"
-                android:textSize="15sp"
-                app:layout_constraintHorizontal_bias="0.9"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintWidth_percent="0.35" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:text="s"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/et_heartbeat_interval"
-                app:layout_constraintLeft_toRightOf="@id/et_heartbeat_interval"
-                app:layout_constraintTop_toTopOf="@id/et_heartbeat_interval" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_ble_settings"
+            android:id="@+id/cl_energy_settings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -133,17 +77,17 @@
             android:padding="10dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_heartbeat_interval">
+            app:layout_constraintTop_toBottomOf="@id/cl_electricity_settings">
 
             <TextView
-                android:id="@+id/tv_ble_settings"
+                android:id="@+id/tv_energy_settings"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:clickable="true"
                 android:drawableRight="@drawable/lw005_ic_arrow_right"
                 android:gravity="center_vertical"
-                android:onClick="onBleSettings"
-                android:text="@string/general_ble_settings"
+                android:onClick="onEnergySettings"
+                android:text="@string/general_energy_settings"
                 android:textColor="@color/lw005_black_333333"
                 android:textSize="15sp"
                 android:textStyle="bold"
@@ -154,7 +98,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_axis_settings"
+            android:id="@+id/cl_protection_settings"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -162,17 +106,104 @@
             android:padding="10dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_ble_settings">
+            app:layout_constraintTop_toBottomOf="@id/cl_energy_settings">
 
             <TextView
-                android:id="@+id/tv_axis_settings"
+                android:id="@+id/tv_protection_settings"
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:clickable="true"
                 android:drawableRight="@drawable/lw005_ic_arrow_right"
                 android:gravity="center_vertical"
-                android:onClick="onAxisSettings"
-                android:text="@string/general_axis_setting"
+                android:onClick="onProtectionSettings"
+                android:text="@string/general_protection_settings"
+                android:textColor="@color/lw005_black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_load_status_notification"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/lw005_white_ffffff"
+            android:padding="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cl_protection_settings">
+
+            <TextView
+                android:id="@+id/tv_load_status_notification"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:drawableRight="@drawable/lw005_ic_arrow_right"
+                android:gravity="center_vertical"
+                android:onClick="onLoadStatusNotification"
+                android:text="@string/general_load_status_notification"
+                android:textColor="@color/lw005_black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_countdown_settings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/lw005_white_ffffff"
+            android:padding="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cl_load_status_notification">
+
+            <TextView
+                android:id="@+id/tv_countdown_settings"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:drawableRight="@drawable/lw005_ic_arrow_right"
+                android:gravity="center_vertical"
+                android:onClick="onCountdownSetting"
+                android:text="@string/general_countdown_settings"
+                android:textColor="@color/lw005_black_333333"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cl_led_settings"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/lw005_white_ffffff"
+            android:padding="10dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cl_countdown_settings">
+
+            <TextView
+                android:id="@+id/tv_led_settings"
+                android:layout_width="0dp"
+                android:layout_height="40dp"
+                android:clickable="true"
+                android:drawableRight="@drawable/lw005_ic_arrow_right"
+                android:gravity="center_vertical"
+                android:onClick="onLEDSetting"
+                android:text="@string/general_led_settings"
                 android:textColor="@color/lw005_black_333333"
                 android:textSize="15sp"
                 android:textStyle="bold"

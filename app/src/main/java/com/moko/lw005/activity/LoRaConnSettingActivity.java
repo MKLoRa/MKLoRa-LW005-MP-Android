@@ -27,6 +27,7 @@ import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
+import com.moko.support.lw005.entity.ControlKeyEnum;
 import com.moko.support.lw005.entity.OrderCHAR;
 import com.moko.support.lw005.entity.ParamsKeyEnum;
 
@@ -86,29 +87,35 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
     TextView tvDr;
     @BindView(R2.id.rl_dr)
     RelativeLayout rlDr;
-    @BindView(R2.id.tv_transmissions)
-    TextView tvTransmissions;
     @BindView(R2.id.tv_dr_1)
     TextView tvDr1;
     @BindView(R2.id.tv_dr_2)
     TextView tvDr2;
     @BindView(R2.id.ll_adr_options)
     LinearLayout llAdrOptions;
+    @BindView(R2.id.tv_device_type)
+    TextView tvDeviceType;
+    @BindView(R2.id.tv_max_retransmission_times)
+    TextView tvMaxRetransmissionTimes;
+    @BindView(R2.id.rl_max_retransmission_times)
+    RelativeLayout rlMaxRetransmissionTimes;
 
     private boolean mReceiverTag = false;
     private ArrayList<String> mModeList;
     private ArrayList<String> mRegionsList;
+    private ArrayList<String> mClassList;
     private ArrayList<String> mMessageTypeList;
-    private ArrayList<String> mTransmissionsNumberList;
+    private ArrayList<String> mMaxRetransmissionTimesList;
     private int mSelectedMode;
     private int mSelectedRegion;
+    private int mSelectedClass;
     private int mSelectedMessageType;
     private int mSelectedCh1;
     private int mSelectedCh2;
     private int mSelectedDr;
     private int mSelectedDr1;
     private int mSelectedDr2;
-    private int mSelectedTransmissions;
+    private int mSelectedMaxRetransmissionTimes;
     private int mMaxCH;
     private int mMaxDR;
     private boolean savedParamsError;
@@ -132,12 +139,16 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         mRegionsList.add("IN865");
         mRegionsList.add("US915");
         mRegionsList.add("RU864");
+        mClassList = new ArrayList<>();
+        mClassList.add("Class A");
+        mClassList.add("Class C");
         mMessageTypeList = new ArrayList<>();
         mMessageTypeList.add("Unconfirmed");
         mMessageTypeList.add("Confirmed");
-        mTransmissionsNumberList = new ArrayList<>();
-        mTransmissionsNumberList.add("1");
-        mTransmissionsNumberList.add("2");
+        mMaxRetransmissionTimesList = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            mMaxRetransmissionTimesList.add(String.valueOf(i));
+        }
         cbAdvanceSetting.setOnCheckedChangeListener(this);
         cbAdr.setOnCheckedChangeListener(this);
         EventBus.getDefault().register(this);
@@ -159,10 +170,12 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
             orderTasks.add(OrderTaskAssembler.getLoraAppSKey());
             orderTasks.add(OrderTaskAssembler.getLoraNwkSKey());
             orderTasks.add(OrderTaskAssembler.getLoraRegion());
+            orderTasks.add(OrderTaskAssembler.getLoraClass());
             orderTasks.add(OrderTaskAssembler.getLoraMessageType());
             orderTasks.add(OrderTaskAssembler.getLoraCH());
             orderTasks.add(OrderTaskAssembler.getLoraDutyCycleEnable());
             orderTasks.add(OrderTaskAssembler.getLoraDR());
+            orderTasks.add(OrderTaskAssembler.getLoraMaxRetransmissionTimes());
             orderTasks.add(OrderTaskAssembler.getLoraUplinkStrategy());
             LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }
@@ -193,6 +206,36 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                 int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 switch (orderCHAR) {
+                    case CHAR_CONTROL:
+                        if (value.length >= 4) {
+                            int header = value[0] & 0xFF;// 0xED
+                            int flag = value[1] & 0xFF;// read or write
+                            int cmd = value[2] & 0xFF;
+                            if (header != 0xED)
+                                return;
+                            ControlKeyEnum configKeyEnum = ControlKeyEnum.fromParamKey(cmd);
+                            if (configKeyEnum == null) {
+                                return;
+                            }
+                            int length = value[3] & 0xFF;
+                            if (flag == 0x01) {
+                                // write
+                                int result = value[4] & 0xFF;
+                                switch (configKeyEnum) {
+                                    case KEY_RESTART:
+                                        if (result != 1) {
+                                            savedParamsError = true;
+                                        }
+                                        if (savedParamsError) {
+                                            ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
+                                        } else {
+                                            ToastUtils.showToast(this, "Saved Successfully！");
+                                        }
+                                        break;
+                                }
+                            }
+                        }
+                        break;
                     case CHAR_PARAMS:
                         if (value.length >= 4) {
                             int header = value[0] & 0xFF;// 0xED
@@ -221,6 +264,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                     case KEY_LORA_CH:
                                     case KEY_LORA_DR:
                                     case KEY_LORA_DUTYCYCLE:
+                                    case KEY_LORA_MAX_RETRANSMISSION_TIMES:
                                         if (result != 1) {
                                             savedParamsError = true;
                                         }
@@ -234,16 +278,6 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                         } else {
                                             showSyncingProgressDialog();
                                             LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.restart());
-                                        }
-                                        break;
-                                    case KEY_RESTART:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
-                                        if (savedParamsError) {
-                                            ToastUtils.showToast(this, "Opps！Save failed. Please check the input characters and try again.");
-                                        } else {
-                                            ToastUtils.showToast(this, "Saved Successfully！");
                                         }
                                         break;
                                 }
@@ -315,6 +349,14 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                             final int messageType = value[4] & 0xFF;
                                             mSelectedMessageType = messageType;
                                             tvMessageType.setText(mMessageTypeList.get(messageType));
+                                            rlMaxRetransmissionTimes.setVisibility(mSelectedMessageType == 0 ? View.GONE : View.VISIBLE);
+                                        }
+                                        break;
+                                    case KEY_LORA_CLASS:
+                                        if (length > 0) {
+                                            final int loraClass = value[4] & 0xFF;
+                                            mSelectedClass = loraClass == 2 ? 1 : 0;
+                                            tvDeviceType.setText(mClassList.get(mSelectedClass));
                                         }
                                         break;
                                     case KEY_LORA_CH:
@@ -340,14 +382,18 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
                                             tvDr.setText(String.valueOf(dr));
                                         }
                                         break;
+                                    case KEY_LORA_MAX_RETRANSMISSION_TIMES:
+                                        if (length > 0) {
+                                            final int times = value[4] & 0xFF;
+                                            mSelectedMaxRetransmissionTimes = times - 1;
+                                            tvMaxRetransmissionTimes.setText(mMaxRetransmissionTimesList.get(mSelectedMaxRetransmissionTimes));
+                                        }
+                                        break;
                                     case KEY_LORA_UPLINK_STRATEGY:
                                         if (length > 0) {
                                             final int adr = value[4] & 0xFF;
                                             cbAdr.setChecked(adr == 1);
                                             llAdrOptions.setVisibility(cbAdr.isChecked() ? View.GONE : View.VISIBLE);
-                                            final int number = value[5] & 0xFF;
-                                            mSelectedTransmissions = number - 1;
-                                            tvTransmissions.setText(mTransmissionsNumberList.get(mSelectedTransmissions));
                                             final int dr1 = value[6] & 0xFF;
                                             mSelectedDr1 = dr1;
                                             final int dr2 = value[7] & 0xFF;
@@ -469,6 +515,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         bottomDialog.setListener(value -> {
             tvMessageType.setText(mMessageTypeList.get(value));
             mSelectedMessageType = value;
+            rlMaxRetransmissionTimes.setVisibility(mSelectedMessageType == 0 ? View.GONE : View.VISIBLE);
         });
         bottomDialog.show(getSupportFragmentManager());
     }
@@ -487,7 +534,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
             case 5:
             case 6:
             case 7:
-                // CN779、EU443、EU868、KR920、IN865
+                // CN779、EU433、EU868、KR920、IN865
                 mSelectedCh1 = 0;
                 mSelectedCh2 = 2;
                 mSelectedDr = 0;
@@ -518,8 +565,8 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         tvDr.setText(String.valueOf(mSelectedDr));
         tvDr1.setText(String.valueOf(mSelectedDr1));
         tvDr2.setText(String.valueOf(mSelectedDr2));
-        mSelectedTransmissions = 0;
-        tvTransmissions.setText(mTransmissionsNumberList.get(mSelectedTransmissions));
+        mSelectedMaxRetransmissionTimes = 0;
+        tvMaxRetransmissionTimes.setText(mMaxRetransmissionTimesList.get(mSelectedMaxRetransmissionTimes));
     }
 
     private ArrayList<String> mCHList;
@@ -534,7 +581,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
             case 5:
             case 6:
             case 7:
-                // CN779、EU443、EU868、KR920、IN865
+                // CN779、EU433、EU868、KR920、IN865
                 mMaxCH = 2;
                 mMaxDR = 5;
                 break;
@@ -687,14 +734,27 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         bottomDialog.show(getSupportFragmentManager());
     }
 
-    public void selectTransmissions(View view) {
+
+    public void selectClass(View view) {
         if (isWindowLocked())
             return;
         BottomDialog bottomDialog = new BottomDialog();
-        bottomDialog.setDatas(mTransmissionsNumberList, mSelectedTransmissions);
+        bottomDialog.setDatas(mClassList, mSelectedClass);
         bottomDialog.setListener(value -> {
-            mSelectedTransmissions = value;
-            tvTransmissions.setText(mTransmissionsNumberList.get(value));
+            mSelectedClass = value;
+            tvDeviceType.setText(mClassList.get(value));
+        });
+        bottomDialog.show(getSupportFragmentManager());
+    }
+
+    public void selectMaxRetransmissionTimes(View view) {
+        if (isWindowLocked())
+            return;
+        BottomDialog bottomDialog = new BottomDialog();
+        bottomDialog.setDatas(mMaxRetransmissionTimesList, mSelectedMaxRetransmissionTimes);
+        bottomDialog.setListener(value -> {
+            mSelectedMaxRetransmissionTimes = value;
+            tvMaxRetransmissionTimes.setText(mMaxRetransmissionTimesList.get(value));
         });
         bottomDialog.show(getSupportFragmentManager());
     }
@@ -755,7 +815,11 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
             orderTasks.add(OrderTaskAssembler.setLoraAppKey(appKey));
         }
         orderTasks.add(OrderTaskAssembler.setLoraUploadMode(mSelectedMode + 1));
+        orderTasks.add(OrderTaskAssembler.setLoraClass(mSelectedClass == 1 ? 2 : 0));
         orderTasks.add(OrderTaskAssembler.setLoraMessageType(mSelectedMessageType));
+        if (mSelectedMessageType == 1) {
+            orderTasks.add(OrderTaskAssembler.setMaxRetransmissionTimes(mSelectedMaxRetransmissionTimes + 1));
+        }
         savedParamsError = false;
         // 保存并连接
         orderTasks.add(OrderTaskAssembler.setLoraRegion(mSelectedRegion));
@@ -769,8 +833,7 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
             // AS923,US915,AU915
             orderTasks.add(OrderTaskAssembler.setLoraDR(mSelectedDr));
         }
-        orderTasks.add(OrderTaskAssembler.setLoraUplinkStrategy(cbAdr.isChecked() ? 1 : 0,
-                mSelectedTransmissions + 1, mSelectedDr1, mSelectedDr2));
+        orderTasks.add(OrderTaskAssembler.setLoraUplinkStrategy(cbAdr.isChecked() ? 1 : 0, mSelectedDr1, mSelectedDr2));
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         showSyncingProgressDialog();
     }

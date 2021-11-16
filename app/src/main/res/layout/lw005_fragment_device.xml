@@ -11,8 +11,9 @@
         android:layout_height="wrap_content"
         android:padding="10dp">
 
+
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_local_data_sync"
+            android:id="@+id/cl_time_zone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:background="@color/lw005_white_ffffff"
@@ -20,64 +21,6 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/tv_local_data_sync"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:clickable="true"
-                android:drawableRight="@drawable/lw005_ic_arrow_right"
-                android:gravity="center_vertical"
-                android:onClick="onLocalDataSync"
-                android:text="@string/local_data_sync"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_indicator_settings"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/lw005_white_ffffff"
-            android:padding="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_local_data_sync">
-
-            <TextView
-                android:id="@+id/tv_indicator_settings"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:clickable="true"
-                android:drawableRight="@drawable/lw005_ic_arrow_right"
-                android:gravity="center_vertical"
-                android:onClick="onIndicatorSettings"
-                android:text="@string/indicator_settings"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_time_zone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/lw005_white_ffffff"
-            android:padding="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_indicator_settings">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -109,155 +52,6 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_payload"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/lw005_white_ffffff"
-            android:padding="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_time_zone">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:text="Shutdown Payload"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/iv_shutdown_payload"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@id/iv_shutdown_payload" />
-
-            <ImageView
-                android:id="@+id/iv_shutdown_payload"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:onClick="onShutdownPayload"
-                android:padding="6dp"
-                android:src="@drawable/lw005_ic_unchecked"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                style="@style/lw005_divider_line"
-                android:layout_width="0dp"
-                android:layout_marginTop="10dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_shutdown_payload" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:text="Low-power Payload"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/iv_low_power_payload"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@id/iv_low_power_payload" />
-
-            <ImageView
-                android:id="@+id/iv_low_power_payload"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:clickable="true"
-                android:onClick="onLowPowerPayload"
-                android:padding="6dp"
-                android:src="@drawable/lw005_ic_unchecked"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/iv_shutdown_payload" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_on_off"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/lw005_white_ffffff"
-            android:padding="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_payload">
-
-            <TextView
-                android:id="@+id/tv_on_off"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:clickable="true"
-                android:drawableRight="@drawable/lw005_ic_arrow_right"
-                android:gravity="center_vertical"
-                android:onClick="onOnOff"
-                android:text="@string/on_off"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_low_power_prompt"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@color/lw005_white_ffffff"
-            android:padding="10dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_on_off">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Low Power Prompt"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/tv_low_power_prompt"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tv_low_power_prompt" />
-
-            <TextView
-                android:id="@+id/tv_low_power_prompt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/lw005_shape_radius_blue_btn_bg"
-                android:clickable="true"
-                android:gravity="center"
-                android:minWidth="70dp"
-                android:onClick="selectLowPowerPrompt"
-                android:padding="12dp"
-                android:text="10%"
-                android:textColor="@color/lw005_white_ffffff"
-                android:textSize="15sp"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_low_power_prompt_tips"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
-                android:text="@string/low_power_prompt_tips"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="12sp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_low_power_prompt" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/cl_device_info"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -266,7 +60,7 @@
             android:padding="10dp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cl_low_power_prompt">
+            app:layout_constraintTop_toBottomOf="@id/cl_time_zone">
 
             <TextView
                 android:id="@+id/tv_device_info"
@@ -311,64 +105,6 @@
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <View
-                style="@style/lw005_divider_line"
-                android:layout_width="0dp"
-                android:layout_marginTop="10dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_factory_reset" />
-
-            <TextView
-                android:id="@+id/tv_change_password"
-                android:layout_width="0dp"
-                android:layout_height="40dp"
-                android:layout_marginTop="20dp"
-                android:clickable="true"
-                android:drawableRight="@drawable/lw005_ic_arrow_right"
-                android:gravity="center_vertical"
-                android:onClick="onChangePassword"
-                android:text="Change Password"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_factory_reset" />
-
-            <View
-                style="@style/lw005_divider_line"
-                android:layout_width="0dp"
-                android:layout_marginTop="10dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_change_password" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:text="Power Off"
-                android:textColor="@color/lw005_black_333333"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/iv_power_off"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@id/iv_power_off" />
-
-            <ImageView
-                android:id="@+id/iv_power_off"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:clickable="true"
-                android:gravity="center_vertical"
-                android:onClick="onPowerOff"
-                android:padding="6dp"
-                android:src="@drawable/lw005_ic_unchecked"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tv_change_password" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

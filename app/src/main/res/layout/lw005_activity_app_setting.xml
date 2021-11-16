@@ -107,7 +107,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_reconnect_interval"
+            android:id="@+id/cl_network_check_interval"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -122,22 +122,22 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Reconnect Interval"
+                android:text="Network Check Interval"
                 android:textColor="@color/lw005_black_333333"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/et_reconnect_interval"
+                app:layout_constraintBottom_toBottomOf="@id/et_network_check_interval"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="@id/et_reconnect_interval" />
+                app:layout_constraintTop_toTopOf="@id/et_network_check_interval" />
 
             <EditText
-                android:id="@+id/et_reconnect_interval"
+                android:id="@+id/et_network_check_interval"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:hint="0~30"
+                android:hint="0~255"
                 android:inputType="number"
-                android:maxLength="2"
+                android:maxLength="3"
                 android:text=""
                 android:textColor="@color/lw005_black_333333"
                 android:textColorHint="@color/lw005_grey_ebebeb"
@@ -152,13 +152,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
-                android:text="Days"
+                android:text="H"
                 android:textColor="@color/lw005_black_333333"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                app:layout_constraintBottom_toBottomOf="@id/et_reconnect_interval"
-                app:layout_constraintLeft_toRightOf="@id/et_reconnect_interval"
-                app:layout_constraintTop_toTopOf="@id/et_reconnect_interval" />
+                app:layout_constraintBottom_toBottomOf="@id/et_network_check_interval"
+                app:layout_constraintLeft_toRightOf="@id/et_network_check_interval"
+                app:layout_constraintTop_toTopOf="@id/et_network_check_interval" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

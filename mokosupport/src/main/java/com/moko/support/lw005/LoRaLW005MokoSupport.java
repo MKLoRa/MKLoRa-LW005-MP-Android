@@ -130,8 +130,8 @@ public class LoRaLW005MokoSupport extends MokoBleLib {
         if (responseUUID.equals(OrderCHAR.CHAR_DISCONNECTED_NOTIFY.getUuid())) {
             orderCHAR = OrderCHAR.CHAR_DISCONNECTED_NOTIFY;
         }
-        if (responseUUID.equals(OrderCHAR.CHAR_STORAGE_DATA_NOTIFY.getUuid())) {
-            orderCHAR = OrderCHAR.CHAR_STORAGE_DATA_NOTIFY;
+        if (responseUUID.equals(OrderCHAR.CHAR_CONTROL.getUuid())) {
+            orderCHAR = OrderCHAR.CHAR_CONTROL;
         }
         if (orderCHAR == null)
             return false;

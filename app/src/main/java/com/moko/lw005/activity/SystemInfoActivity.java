@@ -25,14 +25,15 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.R;
 import com.moko.lw005.R2;
+import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.service.DfuService;
 import com.moko.lw005.utils.FileUtils;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
+import com.moko.support.lw005.entity.ControlKeyEnum;
 import com.moko.support.lw005.entity.OrderCHAR;
-import com.moko.support.lw005.entity.ParamsKeyEnum;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -61,8 +62,6 @@ public class SystemInfoActivity extends BaseActivity {
     TextView tvFirmwareVersion;
     @BindView(R2.id.tv_hardware_version)
     TextView tvHardwareVersion;
-    @BindView(R2.id.tv_battery_voltage)
-    TextView tvBatteryVoltage;
     @BindView(R2.id.tv_mac_address)
     TextView tvMacAddress;
     @BindView(R2.id.tv_product_model)
@@ -71,7 +70,6 @@ public class SystemInfoActivity extends BaseActivity {
     TextView tvManufacture;
     private boolean mReceiverTag = false;
     private String mDeviceMac;
-    private String mDeviceName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +84,7 @@ public class SystemInfoActivity extends BaseActivity {
         mReceiverTag = true;
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.getAdvName());
         orderTasks.add(OrderTaskAssembler.getMacAddress());
-        orderTasks.add(OrderTaskAssembler.getBattery());
         orderTasks.add(OrderTaskAssembler.getDeviceModel());
         orderTasks.add(OrderTaskAssembler.getSoftwareVersion());
         orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
@@ -148,14 +144,14 @@ public class SystemInfoActivity extends BaseActivity {
                         String manufacture = new String(value);
                         tvManufacture.setText(manufacture);
                         break;
-                    case CHAR_PARAMS:
+                    case CHAR_CONTROL:
                         if (value.length >= 4) {
                             int header = value[0] & 0xFF;// 0xED
                             int flag = value[1] & 0xFF;// read or write
                             int cmd = value[2] & 0xFF;
                             if (header != 0xED)
                                 return;
-                            ParamsKeyEnum configKeyEnum = ParamsKeyEnum.fromParamKey(cmd);
+                            ControlKeyEnum configKeyEnum = ControlKeyEnum.fromParamKey(cmd);
                             if (configKeyEnum == null) {
                                 return;
                             }
@@ -163,21 +159,7 @@ public class SystemInfoActivity extends BaseActivity {
                             if (flag == 0x00) {
                                 // read
                                 switch (configKeyEnum) {
-                                    case KEY_ADV_NAME:
-                                        if (length > 0) {
-                                            byte[] rawDataBytes = Arrays.copyOfRange(value, 4, 4 + length);
-                                            mDeviceName = new String(rawDataBytes);
-                                        }
-                                        break;
-                                    case KEY_BATTERY_POWER:
-                                        if (length > 0) {
-                                            byte[] batteryBytes = Arrays.copyOfRange(value, 4, 4 + length);
-                                            int battery = MokoUtils.toInt(batteryBytes);
-                                            String batteryStr = MokoUtils.getDecimalFormat("0.000").format(battery * 0.001);
-                                            tvBatteryVoltage.setText(String.format("%sV", batteryStr));
-                                        }
-                                        break;
-                                    case KEY_CHIP_MAC:
+                                    case KEY_MAC:
                                         if (length > 0) {
                                             byte[] macBytes = Arrays.copyOfRange(value, 4, 4 + length);
                                             String mac = MokoUtils.bytesToHexString(macBytes);
@@ -263,16 +245,23 @@ public class SystemInfoActivity extends BaseActivity {
     public void onUpdateFirmware(View view) {
         if (isWindowLocked())
             return;
-        if (TextUtils.isEmpty(mDeviceName) || TextUtils.isEmpty(mDeviceMac))
+        if (TextUtils.isEmpty(mDeviceMac))
             return;
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        try {
-            startActivityForResult(Intent.createChooser(intent, "select file first!"), REQUEST_CODE_SELECT_FIRMWARE);
-        } catch (ActivityNotFoundException ex) {
-            ToastUtils.showToast(this, "install file manager app");
-        }
+        AlertMessageDialog dialog = new AlertMessageDialog();
+        dialog.setMessage("Please disconnect the load device before DFU, otherwise there may be security risks.");
+        dialog.setConfirm("OK");
+        dialog.setCancelGone();
+        dialog.setOnAlertConfirmListener(() -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("*/*");//设置类型，我这里是任意类型，任意后缀的可以这样写。
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            try {
+                startActivityForResult(Intent.createChooser(intent, "select file first!"), REQUEST_CODE_SELECT_FIRMWARE);
+            } catch (ActivityNotFoundException ex) {
+                ToastUtils.showToast(this, "install file manager app");
+            }
+        });
+        dialog.show(getSupportFragmentManager());
     }
 
     private ProgressDialog mDFUDialog;
@@ -392,7 +381,6 @@ public class SystemInfoActivity extends BaseActivity {
                 final File firmwareFile = new File(firmwareFilePath);
                 if (firmwareFile.exists()) {
                     final DfuServiceInitiator starter = new DfuServiceInitiator(mDeviceMac)
-                            .setDeviceName(mDeviceName)
                             .setKeepBond(false)
                             .setDisableNotification(true);
                     starter.setZip(null, firmwareFilePath);

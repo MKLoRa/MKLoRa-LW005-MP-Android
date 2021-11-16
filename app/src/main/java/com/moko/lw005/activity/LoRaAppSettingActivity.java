@@ -40,8 +40,8 @@ public class LoRaAppSettingActivity extends BaseActivity {
 
     @BindView(R2.id.et_sync_interval)
     EditText etSyncInterval;
-    @BindView(R2.id.et_reconnect_interval)
-    EditText etReconnectInterval;
+    @BindView(R2.id.et_network_check_interval)
+    EditText etNetworkCheckInterval;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
 
@@ -59,7 +59,7 @@ public class LoRaAppSettingActivity extends BaseActivity {
         showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.getLoraTimeSyncInterval());
-        orderTasks.add(OrderTaskAssembler.getLoraReconnectInterval());
+        orderTasks.add(OrderTaskAssembler.getLoraNetworkCheckInterval());
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
@@ -111,7 +111,7 @@ public class LoRaAppSettingActivity extends BaseActivity {
                                             savedParamsError = true;
                                         }
                                         break;
-                                    case KEY_LORA_RECONNECT_INTERVAL:
+                                    case KEY_LORA_NETWORK_CHECK_INTERVAL:
                                         if (result != 1) {
                                             savedParamsError = true;
                                         }
@@ -136,10 +136,10 @@ public class LoRaAppSettingActivity extends BaseActivity {
                                             etSyncInterval.setText(String.valueOf(interval));
                                         }
                                         break;
-                                    case KEY_LORA_RECONNECT_INTERVAL:
+                                    case KEY_LORA_NETWORK_CHECK_INTERVAL:
                                         if (length > 0) {
                                             int interval = value[4] & 0xFF;
-                                            etReconnectInterval.setText(String.valueOf(interval));
+                                            etNetworkCheckInterval.setText(String.valueOf(interval));
                                         }
                                         break;
                                 }
@@ -170,11 +170,11 @@ public class LoRaAppSettingActivity extends BaseActivity {
         if (syncInterval > 255) {
             return false;
         }
-        final String reconnectIntervalStr = etReconnectInterval.getText().toString();
-        if (TextUtils.isEmpty(reconnectIntervalStr))
+        final String networkCheckIntervalStr = etNetworkCheckInterval.getText().toString();
+        if (TextUtils.isEmpty(networkCheckIntervalStr))
             return false;
-        final int reconnectInterval = Integer.parseInt(reconnectIntervalStr);
-        if (reconnectInterval > 30) {
+        final int networkCheckInterval = Integer.parseInt(networkCheckIntervalStr);
+        if (networkCheckInterval > 255) {
             return false;
         }
         return true;
@@ -184,13 +184,13 @@ public class LoRaAppSettingActivity extends BaseActivity {
 
     private void saveParams() {
         final String syncIntervalStr = etSyncInterval.getText().toString();
-        final String reconnectIntervalStr = etReconnectInterval.getText().toString();
+        final String networkCheckIntervalStr = etNetworkCheckInterval.getText().toString();
         final int syncInterval = Integer.parseInt(syncIntervalStr);
-        final int reconnectInterval = Integer.parseInt(reconnectIntervalStr);
+        final int networkCheckInterval = Integer.parseInt(networkCheckIntervalStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setLoraTimeSyncInterval(syncInterval));
-        orderTasks.add(OrderTaskAssembler.setLoraReconnectInterval(reconnectInterval));
+        orderTasks.add(OrderTaskAssembler.setLoraNetworkInterval(networkCheckInterval));
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 

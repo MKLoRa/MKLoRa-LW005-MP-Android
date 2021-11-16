@@ -251,7 +251,8 @@ public class FileUtils {
      * @return
      */
     public static boolean isHuaweiMediaDocument(Uri uri) {
-        return "com.huawei.hidisk.fileprovider".equals(uri.getAuthority())
+        String path = uri.getPath();
+        return path.contains("/root") || "com.huawei.hidisk.fileprovider".equals(uri.getAuthority())
                 || "com.huawei.filemanager.share.fileprovider".equals(uri.getAuthority());
     }
 
