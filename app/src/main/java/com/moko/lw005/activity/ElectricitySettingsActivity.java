@@ -106,7 +106,7 @@ public class ElectricitySettingsActivity extends BaseActivity {
                                 // write
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
-                                    case KEY_SWITCH_PAYLOADS_REPORT_INTERVAL:
+                                    case KEY_ELECTRICITY_PAYLOADS_REPORT_INTERVAL:
                                         if (result != 1) {
                                             savedParamsError = true;
                                         }
@@ -125,7 +125,7 @@ public class ElectricitySettingsActivity extends BaseActivity {
                             if (flag == 0x00) {
                                 // read
                                 switch (configKeyEnum) {
-                                    case KEY_SWITCH_PAYLOADS_REPORT_INTERVAL:
+                                    case KEY_ELECTRICITY_PAYLOADS_REPORT_INTERVAL:
                                         if (length > 0) {
                                             byte[] intervalBytes = Arrays.copyOfRange(value, 4, 4 + length);
                                             int interval = MokoUtils.toInt(intervalBytes);

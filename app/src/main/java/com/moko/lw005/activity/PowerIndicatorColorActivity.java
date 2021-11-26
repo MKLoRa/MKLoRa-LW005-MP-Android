@@ -75,8 +75,14 @@ public class PowerIndicatorColorActivity extends BaseActivity {
         deviceSpecification = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_SPECIFICATION, 0);
         mValues = new ArrayList<>();
         mValues.add("Active power indicator with color direct transition");
-        mValues.add("On");
-        mValues.add("Restore Last Mode");
+        mValues.add("Active power indicator with color smooth transition");
+        mValues.add("White");
+        mValues.add("Red");
+        mValues.add("Green");
+        mValues.add("Blue");
+        mValues.add("Orange");
+        mValues.add("Cyan");
+        mValues.add("Purple");
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -89,7 +95,7 @@ public class PowerIndicatorColorActivity extends BaseActivity {
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
     public void onConnectStatusEvent(ConnectStatusEvent event) {
         final String action = event.getAction();
         runOnUiThread(() -> {
@@ -99,7 +105,7 @@ public class PowerIndicatorColorActivity extends BaseActivity {
         });
     }
 
-    @Subscribe(threadMode = ThreadMode.POSTING, priority = 200)
+    @Subscribe(threadMode = ThreadMode.POSTING, priority = 300)
     public void onOrderTaskResponseEvent(OrderTaskResponseEvent event) {
         final String action = event.getAction();
         if (!MokoConstants.ACTION_CURRENT_DATA.equals(action))
@@ -154,6 +160,7 @@ public class PowerIndicatorColorActivity extends BaseActivity {
                                     case KEY_POWER_INDICATOR_COLOR:
                                         if (length > 0) {
                                             mSelected = value[4] & 0xFF;
+                                            tvPowerIndicatorColorType.setText(mValues.get(mSelected));
                                             if (mSelected > 1) {
                                                 llColorSettings.setVisibility(View.GONE);
                                             } else {

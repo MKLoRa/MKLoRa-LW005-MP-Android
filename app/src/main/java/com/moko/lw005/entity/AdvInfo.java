@@ -10,6 +10,7 @@ public class AdvInfo {
     public long intervalTime;
     public int txPower;
     public boolean connectable;
+    public boolean needPassword;
     public int voltage;
     public int current;
     public int power;

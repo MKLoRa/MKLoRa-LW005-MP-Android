@@ -155,7 +155,6 @@ public class BleFragment extends Fragment implements SeekBar.OnSeekBarChangeList
         final String advNameStr = etAdvName.getText().toString();
         final String advIntervalStr = etAdvInterval.getText().toString();
         final int interval = Integer.parseInt(advIntervalStr);
-        activity.showSyncingProgressDialog();
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setBleAdvName(advNameStr));
         orderTasks.add(OrderTaskAssembler.setBleAdvInterval(interval));

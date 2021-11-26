@@ -84,6 +84,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     private int mSelectUploadMode;
     private boolean mReceiverTag = false;
     private int disConnectType;
+    private boolean noPassword;
 
     private boolean savedParamsError;
 
@@ -113,8 +114,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         mRegions.add("US915");
         mRegions.add("RU864");
         mClass = new ArrayList<>();
-        mClass.add("Class A");
-        mClass.add("Class C");
+        mClass.add("ClassA");
+        mClass.add("ClassC");
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -159,12 +160,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
         final String action = event.getAction();
         runOnUiThread(() -> {
             if (MokoConstants.ACTION_DISCONNECTED.equals(action)) {
-                if (LoRaLW005MokoSupport.getInstance().exportDatas != null) {
-                    LoRaLW005MokoSupport.getInstance().exportDatas.clear();
-                    LoRaLW005MokoSupport.getInstance().storeString = null;
-                    LoRaLW005MokoSupport.getInstance().startTime = 0;
-                    LoRaLW005MokoSupport.getInstance().sum = 0;
-                }
                 showDisconnectDialog();
             }
             if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
@@ -343,6 +338,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                                     case KEY_BLE_LOGIN_MODE:
                                         if (length > 0) {
                                             int loginMode = value[4] & 0xFF;
+                                            noPassword = loginMode == 0;
                                             bleFragment.setBleLoginMode(loginMode);
                                         }
                                         break;
@@ -592,7 +588,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     private void showBleAndGetData() {
         tvTitle.setText("Bluetooth Settings");
-        ivSave.setVisibility(View.GONE);
+        ivSave.setVisibility(View.VISIBLE);
         fragmentManager.beginTransaction()
                 .hide(loraFragment)
                 .hide(generalFragment)
@@ -721,6 +717,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     public void onChangeLoginMode(View view) {
         if (isWindowLocked())
+            return;
+        if (noPassword)
             return;
         bleFragment.changeLoginMode();
     }

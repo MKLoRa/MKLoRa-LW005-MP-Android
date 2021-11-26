@@ -13,13 +13,11 @@ import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.support.lw005.entity.ExportData;
 import com.moko.support.lw005.entity.OrderCHAR;
 import com.moko.support.lw005.handler.MokoCharacteristicHandler;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -130,9 +128,6 @@ public class LoRaLW005MokoSupport extends MokoBleLib {
         if (responseUUID.equals(OrderCHAR.CHAR_DISCONNECTED_NOTIFY.getUuid())) {
             orderCHAR = OrderCHAR.CHAR_DISCONNECTED_NOTIFY;
         }
-        if (responseUUID.equals(OrderCHAR.CHAR_CONTROL.getUuid())) {
-            orderCHAR = OrderCHAR.CHAR_CONTROL;
-        }
         if (orderCHAR == null)
             return false;
         XLog.i(orderCHAR.name());
@@ -145,9 +140,4 @@ public class LoRaLW005MokoSupport extends MokoBleLib {
         EventBus.getDefault().post(event);
         return true;
     }
-
-    public ArrayList<ExportData> exportDatas;
-    public StringBuilder storeString;
-    public int startTime;
-    public int sum;
 }

@@ -823,7 +823,10 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         savedParamsError = false;
         // 保存并连接
         orderTasks.add(OrderTaskAssembler.setLoraRegion(mSelectedRegion));
-        orderTasks.add(OrderTaskAssembler.setLoraCH(mSelectedCh1, mSelectedCh2));
+        if (mSelectedRegion == 1 || mSelectedRegion == 2 || mSelectedRegion == 8) {
+            // US915,AU915,CN470
+            orderTasks.add(OrderTaskAssembler.setLoraCH(mSelectedCh1, mSelectedCh2));
+        }
         if (mSelectedRegion == 3 || mSelectedRegion == 4
                 || mSelectedRegion == 5 || mSelectedRegion == 9) {
             // CN779,EU433,EU868 and RU864

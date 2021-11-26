@@ -85,6 +85,7 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
     private MokoBleScanner mokoBleScanner;
     public Handler mHandler;
     private boolean isPasswordError;
+    private boolean isNeedPassword;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -338,6 +339,12 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
                 mHandler.removeMessages(0);
                 mokoBleScanner.stopScanDevice();
             }
+            isNeedPassword = advInfo.needPassword;
+            if (!isNeedPassword) {
+                showLoadingProgressDialog();
+                ivRefresh.postDelayed(() -> LoRaLW005MokoSupport.getInstance().connDevice(advInfo.mac), 500);
+                return;
+            }
             // show password
             final PasswordDialog dialog = new PasswordDialog(LoRaLW005MainActivity.this);
             dialog.setData(mSavedPassword);
@@ -420,6 +427,12 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
         }
         if (MokoConstants.ACTION_DISCOVER_SUCCESS.equals(action)) {
             dismissLoadingProgressDialog();
+            if (!isNeedPassword) {
+                XLog.i("Success");
+                Intent i = new Intent(LoRaLW005MainActivity.this, DeviceInfoActivity.class);
+                startActivityForResult(i, AppConstants.REQUEST_CODE_DEVICE_INFO);
+                return;
+            }
             showLoadingMessageDialog();
             mHandler.postDelayed(() -> {
                 // open password notify and set passwrord

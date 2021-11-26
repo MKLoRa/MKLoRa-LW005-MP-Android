@@ -35,7 +35,7 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<AdvInfo> {
         if (manufacturer == null || manufacturer.size() == 0)
             return null;
         byte[] manufacturerSpecificDataByte = record.getManufacturerSpecificData(manufacturer.keyAt(0));
-        if (manufacturerSpecificDataByte.length != 22)
+        if (manufacturerSpecificDataByte.length != 23)
             return null;
         int deviceType = -1;
         int voltage = MokoUtils.toInt(Arrays.copyOfRange(manufacturerSpecificDataByte, 6, 8));
@@ -73,6 +73,7 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<AdvInfo> {
             advInfo.power = power;
             advInfo.powerFactor = powerFactor;
             advInfo.currentRate = currentRate;
+            advInfo.needPassword = (loadState & 0x02) == 2;
             advInfo.loadState = loadState;
         } else {
             advInfo = new AdvInfo();
@@ -88,6 +89,7 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<AdvInfo> {
             advInfo.power = power;
             advInfo.powerFactor = powerFactor;
             advInfo.currentRate = currentRate;
+            advInfo.needPassword = (loadState & 0x02) == 2;
             advInfo.loadState = loadState;
             advInfoHashMap.put(deviceInfo.mac, advInfo);
         }

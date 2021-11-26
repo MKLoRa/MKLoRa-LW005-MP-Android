@@ -119,9 +119,11 @@ public class EnergySettingsActivity extends BaseActivity {
                                         if (length > 0) {
                                             int total = MokoUtils.toInt(Arrays.copyOfRange(value, 4, 8));
                                             int constant = MokoUtils.toInt(Arrays.copyOfRange(value, 10, 12));
-                                            float totalEnergy = total * 1.0f / constant;
-                                            String energyTotalMonthly = MokoUtils.getDecimalFormat("0.0").format(totalEnergy);
-                                            tvTotalEnergy.setText(energyTotalMonthly);
+                                            if (constant != 0) {
+                                                float totalEnergy = total * 1.0f / constant;
+                                                String energyTotalMonthly = MokoUtils.getDecimalFormat("0.0").format(totalEnergy);
+                                                tvTotalEnergy.setText(energyTotalMonthly);
+                                            }
                                         }
                                         break;
                                 }
@@ -274,6 +276,8 @@ public class EnergySettingsActivity extends BaseActivity {
             return false;
         final int saveInterval = Integer.parseInt(saveIntervalStr);
         if (saveInterval < 1 || saveInterval > 60)
+            return false;
+        if (reportInterval < saveInterval)
             return false;
         final String powerChangeValueStr = etPowerChangeValue.getText().toString();
         if (TextUtils.isEmpty(powerChangeValueStr))

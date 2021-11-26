@@ -21,6 +21,7 @@ public class ControlReadTask extends OrderTask {
             case KEY_SWITCH_STATUS:
             case KEY_NETWORK_STATUS:
             case KEY_TOTAL_ENERGY:
+            case KEY_LOAD_STATUS:
             case KEY_MAC:
                 createGetConfigData(key.getParamsKey());
                 break;
