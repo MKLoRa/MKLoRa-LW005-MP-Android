@@ -18,6 +18,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.R;
+import com.moko.lw005.R2;
 import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
@@ -40,7 +41,7 @@ import butterknife.ButterKnife;
 public class CountdownSettingsActivity extends BaseActivity {
 
 
-    @BindView(R.id.et_countdown_report_interval)
+    @BindView(R2.id.et_countdown_report_interval)
     EditText etCountdownReportInterval;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;

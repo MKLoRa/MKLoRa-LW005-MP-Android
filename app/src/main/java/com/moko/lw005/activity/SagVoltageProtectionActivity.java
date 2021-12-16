@@ -19,6 +19,7 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw005.AppConstants;
 import com.moko.lw005.R;
+import com.moko.lw005.R2;
 import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
@@ -40,11 +41,11 @@ import butterknife.ButterKnife;
 public class SagVoltageProtectionActivity extends BaseActivity {
 
 
-    @BindView(R.id.cb_sag_voltage_protection)
+    @BindView(R2.id.cb_sag_voltage_protection)
     CheckBox cbSagVoltageProtection;
-    @BindView(R.id.et_sag_voltage_threshold)
+    @BindView(R2.id.et_sag_voltage_threshold)
     EditText etSagVoltageThreshold;
-    @BindView(R.id.et_time_threshold)
+    @BindView(R2.id.et_time_threshold)
     EditText etTimeThreshold;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;

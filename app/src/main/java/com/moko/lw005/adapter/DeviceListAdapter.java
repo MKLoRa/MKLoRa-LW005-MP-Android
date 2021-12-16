@@ -31,24 +31,25 @@ public class DeviceListAdapter extends BaseQuickAdapter<AdvInfo, BaseViewHolder>
         helper.setText(R.id.tv_power, String.format("%s W", MokoUtils.getDecimalFormat("0.0").format(item.current * 0.1)));
         helper.setText(R.id.tv_power_factor, String.format("%d %%", item.powerFactor));
         helper.setText(R.id.tv_current_rate, String.format("%s HZ", MokoUtils.getDecimalFormat("0.000").format(item.current * 0.001)));
-        if ((item.loadState & 0x80) == 0) {
-            TextView view = helper.getView(R.id.tv_load_status);
-            view.setText("OFF");
-            Drawable left = mContext.getResources().getDrawable(R.drawable.lw005_ic_load_close);
-            view.setCompoundDrawablesWithIntrinsicBounds(left, null, null, null);
-        } else {
-            TextView view = helper.getView(R.id.tv_load_status);
+        TextView view = helper.getView(R.id.tv_load_status);
+        Drawable left = mContext.getResources().getDrawable(R.drawable.lw005_ic_overload);
+        view.setCompoundDrawablesWithIntrinsicBounds(left, null, null, null);
+        if ((item.loadState & 0x04) == 0x04) {
+            view.setText("OverLoad");
+        } else if ((item.loadState & 0x08) == 0x08) {
+            view.setText("OverCurrent");
+        } else if ((item.loadState & 0x10) == 0x10) {
+            view.setText("SagVoltage");
+        } else if ((item.loadState & 0x20) == 0x20) {
+            view.setText("OverVoltage");
+        } else if ((item.loadState & 0x80) == 0x80) {
             view.setText("ON");
-            if ((item.loadState & 0x20) == 0
-                    && (item.loadState & 0x10) == 0
-                    && (item.loadState & 0x08) == 0
-                    && (item.loadState & 0x04) == 0) {
-                Drawable left = mContext.getResources().getDrawable(R.drawable.lw005_ic_load_open);
-                view.setCompoundDrawablesWithIntrinsicBounds(left, null, null, null);
-            } else {
-                Drawable left = mContext.getResources().getDrawable(R.drawable.lw005_ic_overload);
-                view.setCompoundDrawablesWithIntrinsicBounds(left, null, null, null);
-            }
+            Drawable on = mContext.getResources().getDrawable(R.drawable.lw005_ic_load_open);
+            view.setCompoundDrawablesWithIntrinsicBounds(on, null, null, null);
+        } else {
+            view.setText("OFF");
+            Drawable off = mContext.getResources().getDrawable(R.drawable.lw005_ic_load_close);
+            view.setCompoundDrawablesWithIntrinsicBounds(off, null, null, null);
         }
         helper.setVisible(R.id.tv_connect, item.connectable);
         helper.addOnClickListener(R.id.tv_connect);
