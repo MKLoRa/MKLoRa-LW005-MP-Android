@@ -228,7 +228,7 @@ public class OverVoltageProtectionActivity extends BaseActivity {
         if (TextUtils.isEmpty(overVoltageStr))
             return false;
         final int overVoltage = Integer.parseInt(overVoltageStr);
-        int min = 213;
+        int min = 231;
         int max = 264;
         if (deviceSpecification == 1) {
             min = 121;

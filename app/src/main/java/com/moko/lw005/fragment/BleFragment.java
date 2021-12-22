@@ -138,9 +138,6 @@ public class BleFragment extends Fragment implements SeekBar.OnSeekBarChangeList
     }
 
     public boolean isValid() {
-        final String advNameStr = etAdvName.getText().toString();
-        if (TextUtils.isEmpty(advNameStr))
-            return false;
         final String advIntervalStr = etAdvInterval.getText().toString();
         if (TextUtils.isEmpty(advIntervalStr))
             return false;

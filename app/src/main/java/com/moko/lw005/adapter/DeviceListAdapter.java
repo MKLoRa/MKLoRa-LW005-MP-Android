@@ -27,10 +27,10 @@ public class DeviceListAdapter extends BaseQuickAdapter<AdvInfo, BaseViewHolder>
         helper.setText(R.id.tv_track_interval, intervalTime);
         helper.setText(R.id.tv_tx_power, String.format("Tx Power:%ddBm", item.txPower));
         helper.setText(R.id.tv_voltage, String.format("%s V", MokoUtils.getDecimalFormat("0.0").format(item.voltage * 0.1)));
-        helper.setText(R.id.tv_current, String.format("%s A", MokoUtils.getDecimalFormat("0.00").format(item.current * 0.01)));
-        helper.setText(R.id.tv_power, String.format("%s W", MokoUtils.getDecimalFormat("0.0").format(item.current * 0.1)));
+        helper.setText(R.id.tv_current, String.format("%s A", MokoUtils.getDecimalFormat("0.00").format(item.current * 0.001)));
+        helper.setText(R.id.tv_power, String.format("%s W", MokoUtils.getDecimalFormat("0.0").format(item.power * 0.1)));
         helper.setText(R.id.tv_power_factor, String.format("%d %%", item.powerFactor));
-        helper.setText(R.id.tv_current_rate, String.format("%s HZ", MokoUtils.getDecimalFormat("0.000").format(item.current * 0.001)));
+        helper.setText(R.id.tv_current_rate, String.format("%s HZ", MokoUtils.getDecimalFormat("0.000").format(item.currentRate * 0.001)));
         TextView view = helper.getView(R.id.tv_load_status);
         Drawable left = mContext.getResources().getDrawable(R.drawable.lw005_ic_overload);
         view.setCompoundDrawablesWithIntrinsicBounds(left, null, null, null);

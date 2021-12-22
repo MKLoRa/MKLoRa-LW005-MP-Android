@@ -286,38 +286,32 @@ public class PowerIndicatorColorActivity extends BaseActivity {
             max = 3588;
         }
         final int blueValue = Integer.parseInt(blue);
-        if (blueValue <= 0 || blueValue >= (max - 5)) {
-            ToastUtils.showToast(this, "Param1 Error");
+        if (blueValue < 2 || blueValue >= (max - 5)) {
             return false;
         }
 
         final int greenValue = Integer.parseInt(green);
-        if (greenValue <= blueValue || greenValue >= (max - 4)) {
-            ToastUtils.showToast(this, "Param2 Error");
+        if (greenValue <= blueValue || greenValue > (max - 4)) {
             return false;
         }
 
         final int yellowValue = Integer.parseInt(yellow);
-        if (yellowValue <= greenValue || yellowValue >= (max - 3)) {
-            ToastUtils.showToast(this, "Param3 Error");
+        if (yellowValue <= greenValue || yellowValue > (max - 3)) {
             return false;
         }
 
         final int orangeValue = Integer.parseInt(orange);
-        if (orangeValue <= yellowValue || orangeValue >= (max - 2)) {
-            ToastUtils.showToast(this, "Param4 Error");
+        if (orangeValue <= yellowValue || orangeValue > (max - 2)) {
             return false;
         }
 
         final int redValue = Integer.parseInt(red);
-        if (redValue <= orangeValue || redValue >= (max - 1)) {
-            ToastUtils.showToast(this, "Param5 Error");
+        if (redValue <= orangeValue || redValue > (max - 1)) {
             return false;
         }
 
         final int purpleValue = Integer.parseInt(purple);
-        if (purpleValue <= redValue || purpleValue >= max) {
-            ToastUtils.showToast(this, "Param6 Error");
+        if (purpleValue <= redValue || purpleValue > max) {
             return false;
         }
         return true;
@@ -354,6 +348,11 @@ public class PowerIndicatorColorActivity extends BaseActivity {
         dialog.setListener(value -> {
             mSelected = value;
             tvPowerIndicatorColorType.setText(mValues.get(value));
+            if (value > 1) {
+                llColorSettings.setVisibility(View.GONE);
+            } else {
+                llColorSettings.setVisibility(View.VISIBLE);
+            }
         });
         dialog.show(getSupportFragmentManager());
     }

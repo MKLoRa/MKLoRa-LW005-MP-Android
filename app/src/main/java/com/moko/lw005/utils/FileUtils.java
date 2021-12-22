@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.text.TextUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -125,6 +126,11 @@ public class FileUtils {
             if (isHuaweiMediaDocument(uri)) {
                 String path = uri.getPath();
                 File file = new File(path.substring("/root".length(), path.length()));
+                return file.exists() ? file.toString() : null;
+            }
+            String path = uri.getPath();
+            if (!TextUtils.isEmpty(path) && path.contains("/storage")) {
+                File file = new File(path.substring(path.indexOf("/storage")));
                 return file.exists() ? file.toString() : null;
             }
             return getDataColumn(context, uri, null, null);

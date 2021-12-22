@@ -388,8 +388,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             dialog.show(getSupportFragmentManager());
         } else if (disConnectType == 4) {
             AlertMessageDialog dialog = new AlertMessageDialog();
-            dialog.setTitle("Factory Reset");
-            dialog.setMessage("Factory reset successfully!\nPlease reconnect the device.");
+            dialog.setTitle("Dismiss");
+            dialog.setMessage("Reboot successfully!\nPlease reconnect the device");
             dialog.setConfirm("OK");
             dialog.setCancelGone();
             dialog.setOnAlertConfirmListener(() -> {
@@ -627,6 +627,8 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
     public void onChangePassword(View view) {
         if (isWindowLocked())
             return;
+        if (noPassword)
+            return;
         final ChangePasswordDialog dialog = new ChangePasswordDialog(this);
         dialog.setOnPasswordClicked(password -> {
             showSyncingProgressDialog();
@@ -717,8 +719,6 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
 
     public void onChangeLoginMode(View view) {
         if (isWindowLocked())
-            return;
-        if (noPassword)
             return;
         bleFragment.changeLoginMode();
     }

@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.moko.ble.lib.task.OrderTask;
 import com.moko.lw005.R;
 import com.moko.lw005.R2;
 import com.moko.lw005.activity.DeviceInfoActivity;
@@ -55,7 +54,7 @@ public class DeviceFragment extends Fragment {
                 if (i % 2 == 0) {
                     mTimeZones.add(String.format("UTC%d", i / 2));
                 } else {
-                    mTimeZones.add(String.format("UTC%d:30", (i - 1) / 2));
+                    mTimeZones.add(i < -1 ? String.format("UTC%d:30", (i + 1) / 2) : "UTC-0:30");
                 }
             } else if (i == 0) {
                 mTimeZones.add("UTC");

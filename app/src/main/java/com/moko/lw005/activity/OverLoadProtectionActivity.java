@@ -231,7 +231,7 @@ public class OverLoadProtectionActivity extends BaseActivity {
 
         int max = 4416;
         if (deviceSpecification == 1) {
-            max = 2460;
+            max = 2160;
         } else if (deviceSpecification == 2) {
             max = 3588;
         }

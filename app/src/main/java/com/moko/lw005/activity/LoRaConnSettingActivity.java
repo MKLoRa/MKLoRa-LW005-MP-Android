@@ -565,8 +565,6 @@ public class LoRaConnSettingActivity extends BaseActivity implements CompoundBut
         tvDr.setText(String.valueOf(mSelectedDr));
         tvDr1.setText(String.valueOf(mSelectedDr1));
         tvDr2.setText(String.valueOf(mSelectedDr2));
-        mSelectedMaxRetransmissionTimes = 0;
-        tvMaxRetransmissionTimes.setText(mMaxRetransmissionTimesList.get(mSelectedMaxRetransmissionTimes));
     }
 
     private ArrayList<String> mCHList;

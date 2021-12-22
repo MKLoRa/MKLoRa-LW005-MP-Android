@@ -39,11 +39,12 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<AdvInfo> {
             return null;
         int deviceType = -1;
         int voltage = MokoUtils.toInt(Arrays.copyOfRange(manufacturerSpecificDataByte, 6, 8));
-        int current = MokoUtils.toInt(Arrays.copyOfRange(manufacturerSpecificDataByte, 8, 10));
-        int power = MokoUtils.toInt(Arrays.copyOfRange(manufacturerSpecificDataByte, 10, 14));
+        int current = MokoUtils.toIntSigned(Arrays.copyOfRange(manufacturerSpecificDataByte, 8, 10));
+        int power = MokoUtils.toIntSigned(Arrays.copyOfRange(manufacturerSpecificDataByte, 10, 14));
         int powerFactor = manufacturerSpecificDataByte[14] & 0xFF;
-        int currentRate = MokoUtils.toInt(Arrays.copyOfRange(manufacturerSpecificDataByte, 19, 21));
+        int currentRate = MokoUtils.toInt(Arrays.copyOfRange(manufacturerSpecificDataByte, 15, 17));
         int loadState = manufacturerSpecificDataByte[21] & 0xFF;
+        int txPower = manufacturerSpecificDataByte[22];
         Iterator iterator = map.keySet().iterator();
         while (iterator.hasNext()) {
             ParcelUuid parcelUuid = (ParcelUuid) iterator.next();
@@ -66,7 +67,7 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<AdvInfo> {
             long intervalTime = currentTime - advInfo.scanTime;
             advInfo.intervalTime = intervalTime;
             advInfo.scanTime = currentTime;
-            advInfo.txPower = result.getTxPower();
+            advInfo.txPower = txPower;
             advInfo.connectable = result.isConnectable();
             advInfo.voltage = voltage;
             advInfo.current = current;
@@ -82,7 +83,7 @@ public class BeaconInfoParseableImpl implements DeviceInfoParseable<AdvInfo> {
             advInfo.rssi = deviceInfo.rssi;
             advInfo.deviceType = deviceType;
             advInfo.scanTime = SystemClock.elapsedRealtime();
-            advInfo.txPower = result.getTxPower();
+            advInfo.txPower = txPower;
             advInfo.connectable = result.isConnectable();
             advInfo.voltage = voltage;
             advInfo.current = current;
