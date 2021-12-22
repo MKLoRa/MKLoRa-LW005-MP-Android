@@ -33,6 +33,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.moko.lw005.activity.LoRaConnSettingActivity"
+            android:hardwareAccelerated="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
