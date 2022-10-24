@@ -18,6 +18,7 @@ import com.moko.support.lw005.handler.MokoCharacteristicHandler;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -27,6 +28,8 @@ public class LoRaLW005MokoSupport extends MokoBleLib {
     private static volatile LoRaLW005MokoSupport INSTANCE;
 
     private Context mContext;
+
+    private MokoBleConfig mBleConfig;
 
     private LoRaLW005MokoSupport() {
         //no instance
@@ -50,8 +53,8 @@ public class LoRaLW005MokoSupport extends MokoBleLib {
 
     @Override
     public MokoBleManager getMokoBleManager() {
-        MokoBleConfig mokoSupportBleManager = new MokoBleConfig(mContext, this);
-        return mokoSupportBleManager;
+        mBleConfig = new MokoBleConfig(mContext, this);
+        return mBleConfig;
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -128,6 +131,9 @@ public class LoRaLW005MokoSupport extends MokoBleLib {
         if (responseUUID.equals(OrderCHAR.CHAR_DISCONNECTED_NOTIFY.getUuid())) {
             orderCHAR = OrderCHAR.CHAR_DISCONNECTED_NOTIFY;
         }
+        if (responseUUID.equals(OrderCHAR.CHAR_LOG.getUuid())) {
+            orderCHAR = OrderCHAR.CHAR_LOG;
+        }
         if (orderCHAR == null)
             return false;
         XLog.i(orderCHAR.name());
@@ -139,5 +145,15 @@ public class LoRaLW005MokoSupport extends MokoBleLib {
         event.setResponse(response);
         EventBus.getDefault().post(event);
         return true;
+    }
+
+    public void enableLogNotify() {
+        if (mBleConfig != null)
+            mBleConfig.enableLogNotify();
+    }
+
+    public void disableLogNotify() {
+        if (mBleConfig != null)
+            mBleConfig.disableLogNotify();
     }
 }

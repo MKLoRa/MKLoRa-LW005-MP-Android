@@ -23,6 +23,7 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lw005.AppConstants;
 import com.moko.lw005.R;
 import com.moko.lw005.R2;
 import com.moko.lw005.dialog.AlertMessageDialog;
@@ -391,5 +392,13 @@ public class SystemInfoActivity extends BaseActivity {
                 }
             }
         }
+    }
+
+    public void onDebuggerMode(View view) {
+        if (isWindowLocked())
+            return;
+        Intent intent = new Intent(this, LogDataActivity.class);
+        intent.putExtra(AppConstants.EXTRA_KEY_DEVICE_MAC, mDeviceMac);
+        startActivity(intent);
     }
 }
