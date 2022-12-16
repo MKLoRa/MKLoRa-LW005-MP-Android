@@ -383,7 +383,6 @@ public class SystemInfoActivity extends BaseActivity {
                 if (firmwareFile.exists()) {
                     final DfuServiceInitiator starter = new DfuServiceInitiator(mDeviceMac)
                             .setKeepBond(false)
-                            .setForeground(false)
                             .setDisableNotification(true);
                     starter.setZip(null, firmwareFilePath);
                     starter.start(this, DfuService.class);
