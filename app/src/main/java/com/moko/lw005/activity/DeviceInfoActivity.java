@@ -33,6 +33,7 @@ import com.moko.lw005.fragment.BleFragment;
 import com.moko.lw005.fragment.DeviceFragment;
 import com.moko.lw005.fragment.GeneralFragment;
 import com.moko.lw005.fragment.LoRaFragment;
+import com.moko.lw005.utils.SPUtiles;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -132,6 +133,7 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
             orderTasks.add(OrderTaskAssembler.getLoraUploadMode());
             orderTasks.add(OrderTaskAssembler.getLoraRegion());
             orderTasks.add(OrderTaskAssembler.getLoraClass());
+            orderTasks.add(OrderTaskAssembler.getFirmwareVersion());
             orderTasks.add(OrderTaskAssembler.getLoraNetworkStatus());
             LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
         }
@@ -216,6 +218,10 @@ public class DeviceInfoActivity extends BaseActivity implements RadioGroup.OnChe
                 int responseType = response.responseType;
                 byte[] value = response.responseValue;
                 switch (orderCHAR) {
+                    case CHAR_FIRMWARE_REVISION:
+                        String firmwareVersion = new String(value);
+                        SPUtiles.setBooleanValue(DeviceInfoActivity.this, AppConstants.SP_KEY_CUSTOMIZED_LW005, "V1.0.4_JC".equalsIgnoreCase(firmwareVersion));
+                        break;
                     case CHAR_CONTROL:
                         if (value.length >= 4) {
                             int header = value[0] & 0xFF;// 0xED

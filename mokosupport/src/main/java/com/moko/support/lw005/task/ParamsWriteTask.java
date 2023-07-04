@@ -226,7 +226,7 @@ public class ParamsWriteTask extends OrderTask {
         };
     }
 
-    public void setSwitchPayloadsReportInterval(@IntRange(from = 10, to = 600) int interval) {
+    public void setSwitchPayloadsReportInterval(@IntRange(from = 1, to = 65535) int interval) {
         byte[] rawDataBytes = MokoUtils.toByteArray(interval, 2);
         data = new byte[]{
                 (byte) 0xED,
@@ -238,7 +238,7 @@ public class ParamsWriteTask extends OrderTask {
         };
     }
 
-    public void setElectricityPayloadsReportInterval(@IntRange(from = 5, to = 600) int interval) {
+    public void setElectricityPayloadsReportInterval(@IntRange(from = 1, to = 65535) int interval) {
         byte[] rawDataBytes = MokoUtils.toByteArray(interval, 2);
         data = new byte[]{
                 (byte) 0xED,
@@ -250,7 +250,7 @@ public class ParamsWriteTask extends OrderTask {
         };
     }
 
-    public void setEnergyConfigInterval(@IntRange(from = 1, to = 60) int reportInterval, @IntRange(from = 1, to = 60) int saveInterval) {
+    public void setEnergyConfigInterval(@IntRange(from = 1, to = 255) int reportInterval, @IntRange(from = 1, to = 255) int saveInterval) {
         data = new byte[]{
                 (byte) 0xED,
                 (byte) 0x01,

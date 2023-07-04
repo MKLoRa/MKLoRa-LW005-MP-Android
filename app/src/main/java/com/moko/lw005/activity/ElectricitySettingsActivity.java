@@ -17,10 +17,12 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lw005.AppConstants;
 import com.moko.lw005.R;
 import com.moko.lw005.R2;
 import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.LoadingMessageDialog;
+import com.moko.lw005.utils.SPUtiles;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -45,6 +47,7 @@ public class ElectricitySettingsActivity extends BaseActivity {
     EditText etElectricityReportReportInterval;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
+    private boolean mIsCustomized;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,9 @@ public class ElectricitySettingsActivity extends BaseActivity {
         setContentView(R.layout.lw005_activity_electricity_settings);
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
+        mIsCustomized = SPUtiles.getBooleanValue(this, AppConstants.SP_KEY_CUSTOMIZED_LW005, false);
+        if (!mIsCustomized)
+            etElectricityReportReportInterval.setHint("5~600");
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -165,12 +171,6 @@ public class ElectricitySettingsActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mReceiverTag) {
-            mReceiverTag = false;
-            // 注销广播
-            unregisterReceiver(mReceiver);
-        }
-        EventBus.getDefault().unregister(this);
     }
 
     private LoadingMessageDialog mLoadingMessageDialog;
@@ -198,6 +198,12 @@ public class ElectricitySettingsActivity extends BaseActivity {
     }
 
     private void backHome() {
+        if (mReceiverTag) {
+            mReceiverTag = false;
+            // 注销广播
+            unregisterReceiver(mReceiver);
+        }
+        EventBus.getDefault().unregister(this);
         setResult(RESULT_OK);
         finish();
     }
@@ -218,10 +224,9 @@ public class ElectricitySettingsActivity extends BaseActivity {
         if (TextUtils.isEmpty(intervalStr))
             return false;
         final int interval = Integer.parseInt(intervalStr);
-        if (interval < 5 || interval > 600)
-            return false;
-        return true;
-
+        if (!mIsCustomized)
+            return interval >= 5 && interval <= 600;
+        return interval >= 1 && interval <= 65535;
     }
 
     private void saveParams() {

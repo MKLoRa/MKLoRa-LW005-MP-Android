@@ -133,12 +133,6 @@ public class ProtectionSettingsActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mReceiverTag) {
-            mReceiverTag = false;
-            // 注销广播
-            unregisterReceiver(mReceiver);
-        }
-        EventBus.getDefault().unregister(this);
     }
 
     private LoadingMessageDialog mLoadingMessageDialog;
@@ -165,6 +159,12 @@ public class ProtectionSettingsActivity extends BaseActivity {
     }
 
     private void backHome() {
+        if (mReceiverTag) {
+            mReceiverTag = false;
+            // 注销广播
+            unregisterReceiver(mReceiver);
+        }
+        EventBus.getDefault().unregister(this);
         finish();
     }
 

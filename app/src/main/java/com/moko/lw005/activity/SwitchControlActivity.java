@@ -19,11 +19,13 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lw005.AppConstants;
 import com.moko.lw005.R;
 import com.moko.lw005.R2;
 import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.BottomDialog;
 import com.moko.lw005.dialog.LoadingMessageDialog;
+import com.moko.lw005.utils.SPUtiles;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -56,6 +58,7 @@ public class SwitchControlActivity extends BaseActivity {
     private boolean savedParamsError;
     private ArrayList<String> mValues;
     private int mSelected;
+    private boolean mIsCustomized;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,9 @@ public class SwitchControlActivity extends BaseActivity {
         mValues.add("Off");
         mValues.add("On");
         mValues.add("Restore Last Mode");
+        mIsCustomized = SPUtiles.getBooleanValue(this, AppConstants.SP_KEY_CUSTOMIZED_LW005, false);
+        if (!mIsCustomized)
+            etSwitchPayloadReportInterval.setHint("10~600");
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -228,12 +234,6 @@ public class SwitchControlActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mReceiverTag) {
-            mReceiverTag = false;
-            // 注销广播
-            unregisterReceiver(mReceiver);
-        }
-        EventBus.getDefault().unregister(this);
     }
 
     private LoadingMessageDialog mLoadingMessageDialog;
@@ -261,6 +261,12 @@ public class SwitchControlActivity extends BaseActivity {
     }
 
     private void backHome() {
+        if (mReceiverTag) {
+            mReceiverTag = false;
+            // 注销广播
+            unregisterReceiver(mReceiver);
+        }
+        EventBus.getDefault().unregister(this);
         setResult(RESULT_OK);
         finish();
     }
@@ -281,10 +287,9 @@ public class SwitchControlActivity extends BaseActivity {
         if (TextUtils.isEmpty(intervalStr))
             return false;
         final int interval = Integer.parseInt(intervalStr);
-        if (interval < 10 || interval > 600)
-            return false;
-        return true;
-
+        if (!mIsCustomized)
+            return interval >= 10 && interval <= 600;
+        return interval >= 1 && interval <= 65535;
     }
 
     private void saveParams() {

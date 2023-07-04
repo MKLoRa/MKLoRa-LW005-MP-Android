@@ -18,10 +18,12 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
+import com.moko.lw005.AppConstants;
 import com.moko.lw005.R;
 import com.moko.lw005.R2;
 import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.LoadingMessageDialog;
+import com.moko.lw005.utils.SPUtiles;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -53,6 +55,7 @@ public class EnergySettingsActivity extends BaseActivity {
     TextView tvTotalEnergy;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
+    private boolean mIsCustomized;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,11 @@ public class EnergySettingsActivity extends BaseActivity {
         setContentView(R.layout.lw005_activity_energy_settings);
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);
+        mIsCustomized = SPUtiles.getBooleanValue(this, AppConstants.SP_KEY_CUSTOMIZED_LW005, false);
+        if (!mIsCustomized) {
+            etEnergyReportInterval.setHint("1~60");
+            etEnergySaveInterval.setHint("1~60");
+        }
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
         filter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -216,12 +224,6 @@ public class EnergySettingsActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mReceiverTag) {
-            mReceiverTag = false;
-            // 注销广播
-            unregisterReceiver(mReceiver);
-        }
-        EventBus.getDefault().unregister(this);
     }
 
     private LoadingMessageDialog mLoadingMessageDialog;
@@ -249,6 +251,12 @@ public class EnergySettingsActivity extends BaseActivity {
     }
 
     private void backHome() {
+        if (mReceiverTag) {
+            mReceiverTag = false;
+            // 注销广播
+            unregisterReceiver(mReceiver);
+        }
+        EventBus.getDefault().unregister(this);
         setResult(RESULT_OK);
         finish();
     }
@@ -269,13 +277,13 @@ public class EnergySettingsActivity extends BaseActivity {
         if (TextUtils.isEmpty(reportIntervalStr))
             return false;
         final int reportInterval = Integer.parseInt(reportIntervalStr);
-        if (reportInterval < 1 || reportInterval > 60)
+        if (reportInterval < 1 || reportInterval > (mIsCustomized ? 255 : 60))
             return false;
         final String saveIntervalStr = etEnergySaveInterval.getText().toString();
         if (TextUtils.isEmpty(saveIntervalStr))
             return false;
         final int saveInterval = Integer.parseInt(saveIntervalStr);
-        if (saveInterval < 1 || saveInterval > 60)
+        if (saveInterval < 1 || saveInterval > (mIsCustomized ? 255 : 60))
             return false;
         if (reportInterval < saveInterval)
             return false;
