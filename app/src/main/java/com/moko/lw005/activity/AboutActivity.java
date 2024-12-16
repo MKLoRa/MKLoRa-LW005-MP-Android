@@ -4,28 +4,22 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.TextView;
 
 import com.moko.lw005.BuildConfig;
 import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivityAboutBinding;
 import com.moko.lw005.utils.Utils;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 
 public class AboutActivity extends BaseActivity {
-    @BindView(R2.id.app_version)
-    TextView appVersion;
+    private Lw005ActivityAboutBinding mBind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_about);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityAboutBinding.inflate(getLayoutInflater());setContentView(mBind.getRoot());
         if (!BuildConfig.IS_LIBRARY) {
-            appVersion.setText(String.format("APP Version:V%s", Utils.getVersionInfo(this)));
+            mBind.appVersion.setText(String.format("APP Version:V%s", Utils.getVersionInfo(this)));
         }
     }
 

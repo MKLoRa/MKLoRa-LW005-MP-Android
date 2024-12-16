@@ -9,9 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -20,11 +17,9 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.AppConstants;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivitySwitchControlBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.BottomDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.SPUtiles;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
@@ -41,18 +36,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class SwitchControlActivity extends BaseActivity {
 
 
-    @BindView(R2.id.cb_switch_control)
-    CheckBox cbSwitchControl;
-    @BindView(R2.id.et_switch_payload_report_interval)
-    EditText etSwitchPayloadReportInterval;
-    @BindView(R2.id.tv_power_on_default_mode)
-    TextView tvPowerOnDefaultMode;
+    private Lw005ActivitySwitchControlBinding mBind;
 
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
@@ -63,15 +50,15 @@ public class SwitchControlActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_switch_control);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivitySwitchControlBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         mValues = new ArrayList<>();
         mValues.add("Off");
         mValues.add("On");
         mValues.add("Restore Last Mode");
         mIsCustomized = SPUtiles.getBooleanValue(this, AppConstants.SP_KEY_CUSTOMIZED_LW005, false);
         if (!mIsCustomized)
-            etSwitchPayloadReportInterval.setHint("10~600");
+            mBind.etSwitchPayloadReportInterval.setHint("10~600");
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -142,7 +129,7 @@ public class SwitchControlActivity extends BaseActivity {
                                     case KEY_SWITCH_STATUS:
                                         if (length > 0) {
                                             int enable = value[4] & 0xFF;
-                                            cbSwitchControl.setChecked(enable == 1);
+                                            mBind.cbSwitchControl.setChecked(enable == 1);
                                         }
                                         break;
                                 }
@@ -191,14 +178,14 @@ public class SwitchControlActivity extends BaseActivity {
                                     case KEY_POWER_ON_DEFAULT_MODE:
                                         if (length > 0) {
                                             mSelected = value[4] & 0xFF;
-                                            tvPowerOnDefaultMode.setText(mValues.get(mSelected));
+                                            mBind.tvPowerOnDefaultMode.setText(mValues.get(mSelected));
                                         }
                                         break;
                                     case KEY_SWITCH_PAYLOADS_REPORT_INTERVAL:
                                         if (length > 0) {
                                             byte[] intervalBytes = Arrays.copyOfRange(value, 4, 4 + length);
                                             int interval = MokoUtils.toInt(intervalBytes);
-                                            etSwitchPayloadReportInterval.setText(String.valueOf(interval));
+                                            mBind.etSwitchPayloadReportInterval.setText(String.valueOf(interval));
                                         }
                                         break;
                                 }
@@ -236,20 +223,6 @@ public class SwitchControlActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();
@@ -283,7 +256,7 @@ public class SwitchControlActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String intervalStr = etSwitchPayloadReportInterval.getText().toString();
+        final String intervalStr = mBind.etSwitchPayloadReportInterval.getText().toString();
         if (TextUtils.isEmpty(intervalStr))
             return false;
         final int interval = Integer.parseInt(intervalStr);
@@ -293,11 +266,11 @@ public class SwitchControlActivity extends BaseActivity {
     }
 
     private void saveParams() {
-        final String intervalStr = etSwitchPayloadReportInterval.getText().toString();
+        final String intervalStr = mBind.etSwitchPayloadReportInterval.getText().toString();
         final int interval = Integer.parseInt(intervalStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setSwitchStatus(cbSwitchControl.isChecked() ? 1 : 0));
+        orderTasks.add(OrderTaskAssembler.setSwitchStatus(mBind.cbSwitchControl.isChecked() ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.setSwitchPayloadsReportInterval(interval));
         orderTasks.add(OrderTaskAssembler.setPowerOnDefaultMode(mSelected));
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
@@ -310,7 +283,7 @@ public class SwitchControlActivity extends BaseActivity {
         dialog.setDatas(mValues, mSelected);
         dialog.setListener(value -> {
             mSelected = value;
-            tvPowerOnDefaultMode.setText(mValues.get(value));
+            mBind.tvPowerOnDefaultMode.setText(mValues.get(value));
         });
         dialog.show(getSupportFragmentManager());
     }

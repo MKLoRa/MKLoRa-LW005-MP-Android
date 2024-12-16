@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -19,10 +17,8 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.AppConstants;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivityEnergySettingsBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.SPUtiles;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
@@ -39,20 +35,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class EnergySettingsActivity extends BaseActivity {
 
 
-    @BindView(R2.id.et_energy_report_interval)
-    EditText etEnergyReportInterval;
-    @BindView(R2.id.et_energy_save_interval)
-    EditText etEnergySaveInterval;
-    @BindView(R2.id.et_power_change_value)
-    EditText etPowerChangeValue;
-    @BindView(R2.id.tv_total_energy)
-    TextView tvTotalEnergy;
+    private Lw005ActivityEnergySettingsBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private boolean mIsCustomized;
@@ -60,13 +46,13 @@ public class EnergySettingsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_energy_settings);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityEnergySettingsBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         mIsCustomized = SPUtiles.getBooleanValue(this, AppConstants.SP_KEY_CUSTOMIZED_LW005, false);
         if (!mIsCustomized) {
-            etEnergyReportInterval.setHint("1~60");
-            etEnergySaveInterval.setHint("1~60");
+            mBind.etEnergyReportInterval.setHint("1~60");
+            mBind.etEnergySaveInterval.setHint("1~60");
         }
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -130,7 +116,7 @@ public class EnergySettingsActivity extends BaseActivity {
                                             if (constant != 0) {
                                                 float totalEnergy = total * 1.0f / constant;
                                                 String energyTotalMonthly = MokoUtils.getDecimalFormat("0.0").format(totalEnergy);
-                                                tvTotalEnergy.setText(energyTotalMonthly);
+                                                mBind.tvTotalEnergy.setText(energyTotalMonthly);
                                             }
                                         }
                                         break;
@@ -181,14 +167,14 @@ public class EnergySettingsActivity extends BaseActivity {
                                         if (length > 0) {
                                             int saveInterval = value[4] & 0xFF;
                                             int reportInterval = value[5] & 0xFF;
-                                            etEnergySaveInterval.setText(String.valueOf(saveInterval));
-                                            etEnergyReportInterval.setText(String.valueOf(reportInterval));
+                                            mBind.etEnergySaveInterval.setText(String.valueOf(saveInterval));
+                                            mBind.etEnergyReportInterval.setText(String.valueOf(reportInterval));
                                         }
                                         break;
                                     case KEY_POWER_CHANGE_VALUE:
                                         if (length > 0) {
                                             int changeValue = value[4] & 0xFF;
-                                            etPowerChangeValue.setText(String.valueOf(changeValue));
+                                            mBind.etPowerChangeValue.setText(String.valueOf(changeValue));
                                         }
                                         break;
                                 }
@@ -226,20 +212,6 @@ public class EnergySettingsActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();
@@ -273,13 +245,13 @@ public class EnergySettingsActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String reportIntervalStr = etEnergyReportInterval.getText().toString();
+        final String reportIntervalStr = mBind.etEnergyReportInterval.getText().toString();
         if (TextUtils.isEmpty(reportIntervalStr))
             return false;
         final int reportInterval = Integer.parseInt(reportIntervalStr);
         if (reportInterval < 1 || reportInterval > (mIsCustomized ? 255 : 60))
             return false;
-        final String saveIntervalStr = etEnergySaveInterval.getText().toString();
+        final String saveIntervalStr = mBind.etEnergySaveInterval.getText().toString();
         if (TextUtils.isEmpty(saveIntervalStr))
             return false;
         final int saveInterval = Integer.parseInt(saveIntervalStr);
@@ -287,7 +259,7 @@ public class EnergySettingsActivity extends BaseActivity {
             return false;
         if (reportInterval < saveInterval)
             return false;
-        final String powerChangeValueStr = etPowerChangeValue.getText().toString();
+        final String powerChangeValueStr = mBind.etPowerChangeValue.getText().toString();
         if (TextUtils.isEmpty(powerChangeValueStr))
             return false;
         final int powerChangeValue = Integer.parseInt(powerChangeValueStr);
@@ -298,11 +270,11 @@ public class EnergySettingsActivity extends BaseActivity {
     }
 
     private void saveParams() {
-        final String reportIntervalStr = etEnergyReportInterval.getText().toString();
+        final String reportIntervalStr = mBind.etEnergyReportInterval.getText().toString();
         final int reportInterval = Integer.parseInt(reportIntervalStr);
-        final String saveIntervalStr = etEnergySaveInterval.getText().toString();
+        final String saveIntervalStr = mBind.etEnergySaveInterval.getText().toString();
         final int saveInterval = Integer.parseInt(saveIntervalStr);
-        final String powerChangeValueStr = etPowerChangeValue.getText().toString();
+        final String powerChangeValueStr = mBind.etPowerChangeValue.getText().toString();
         final int powerChangeValue = Integer.parseInt(powerChangeValueStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();

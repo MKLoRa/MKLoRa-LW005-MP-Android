@@ -1,37 +1,30 @@
 package com.moko.lw005.dialog;
 
 import android.view.Gravity;
-import android.view.View;
-import android.widget.ImageView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
 import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005DialogLoadingBinding;
 import com.moko.lw005.view.ProgressDrawable;
 
 import androidx.core.content.ContextCompat;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
-public class LoadingDialog extends MokoBaseDialog {
-
+public class LoadingDialog extends MokoBaseDialog<Lw005DialogLoadingBinding> {
     public static final String TAG = LoadingDialog.class.getSimpleName();
-    @BindView(R2.id.iv_loading)
-    ImageView ivLoading;
 
     @Override
-    public int getLayoutRes() {
-        return R.layout.lw005_dialog_loading;
+    protected Lw005DialogLoadingBinding getViewBind(LayoutInflater inflater, ViewGroup container) {
+        return Lw005DialogLoadingBinding.inflate(inflater, container, false);
     }
 
     @Override
-    public void bindView(View v) {
-        ButterKnife.bind(this, v);
+    protected void onCreateView() {
         ProgressDrawable progressDrawable = new ProgressDrawable();
         progressDrawable.setColor(ContextCompat.getColor(getContext(), R.color.lw005_text_black_4d4d4d));
-        ivLoading.setImageDrawable(progressDrawable);
+        mBind.ivLoading.setImageDrawable(progressDrawable);
         progressDrawable.start();
     }
-
 
     @Override
     public int getDialogStyle() {
@@ -66,6 +59,6 @@ public class LoadingDialog extends MokoBaseDialog {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ((ProgressDrawable) ivLoading.getDrawable()).stop();
+        ((ProgressDrawable) mBind.ivLoading.getDrawable()).stop();
     }
 }

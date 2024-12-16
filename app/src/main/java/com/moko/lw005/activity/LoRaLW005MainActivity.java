@@ -14,9 +14,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.elvishew.xlog.XLog;
@@ -28,10 +25,9 @@ import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw005.AppConstants;
 import com.moko.lw005.BuildConfig;
 import com.moko.lw005.R;
-import com.moko.lw005.R2;
 import com.moko.lw005.adapter.DeviceListAdapter;
+import com.moko.lw005.databinding.Lw005ActivityMainBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingDialog;
 import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.dialog.PasswordDialog;
 import com.moko.lw005.dialog.ScanFilterDialog;
@@ -63,23 +59,9 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDeviceCallback, BaseQuickAdapter.OnItemChildClickListener {
-    @BindView(R2.id.iv_refresh)
-    ImageView ivRefresh;
-    @BindView(R2.id.rv_devices)
-    RecyclerView rvDevices;
-    @BindView(R2.id.tv_device_num)
-    TextView tvDeviceNum;
-    @BindView(R2.id.rl_edit_filter)
-    RelativeLayout rl_edit_filter;
-    @BindView(R2.id.rl_filter)
-    RelativeLayout rl_filter;
-    @BindView(R2.id.tv_filter)
-    TextView tv_filter;
+    private Lw005ActivityMainBinding mBind;
     private boolean mReceiverTag = false;
     private ConcurrentHashMap<String, AdvInfo> beaconInfoHashMap;
     private ArrayList<AdvInfo> beaconInfos;
@@ -95,8 +77,8 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_main);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         // 初始化Xlog
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             // 优先保存到SD卡中
@@ -117,11 +99,11 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
         adapter.replaceData(beaconInfos);
         adapter.setOnItemChildClickListener(this);
         adapter.openLoadAnimation();
-        rvDevices.setLayoutManager(new LinearLayoutManager(this));
+        mBind.rvDevices.setLayoutManager(new LinearLayoutManager(this));
         DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         itemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.lw005_shape_recycleview_divider));
-        rvDevices.addItemDecoration(itemDecoration);
-        rvDevices.setAdapter(adapter);
+        mBind.rvDevices.addItemDecoration(itemDecoration);
+        mBind.rvDevices.setAdapter(adapter);
         mHandler = new Handler(Looper.getMainLooper());
         mokoBleScanner = new MokoBleScanner(this);
         EventBus.getDefault().register(this);
@@ -144,7 +126,7 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
             return;
         }
         animation = AnimationUtils.loadAnimation(this, R.anim.lw005_rotate_refresh);
-        ivRefresh.startAnimation(animation);
+        mBind.ivRefresh.startAnimation(animation);
         beaconInfoParseable = new BeaconInfoParseableImpl();
         mokoBleScanner.startScanDevice(this);
         mHandler.postDelayed(new Runnable() {
@@ -167,7 +149,7 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
             while (animation != null) {
                 runOnUiThread(() -> {
                     adapter.replaceData(beaconInfos);
-                    tvDeviceNum.setText(String.format("DEVICE(%d)", beaconInfos.size()));
+                    mBind.tvDeviceNum.setText(String.format("DEVICE(%d)", beaconInfos.size()));
                 });
                 try {
                     Thread.sleep(500);
@@ -189,7 +171,7 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
 
     @Override
     public void onStopScan() {
-        ivRefresh.clearAnimation();
+        mBind.ivRefresh.clearAnimation();
         animation = null;
     }
 
@@ -292,8 +274,8 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
                 LoRaLW005MainActivity.this.filterName = filterName;
                 LoRaLW005MainActivity.this.filterRssi = filterRssi;
                 if (!TextUtils.isEmpty(filterName) || filterRssi != -127) {
-                    rl_filter.setVisibility(View.VISIBLE);
-                    rl_edit_filter.setVisibility(View.GONE);
+                    mBind.rlFilter.setVisibility(View.VISIBLE);
+                    mBind.rlEditFilter.setVisibility(View.GONE);
                     StringBuilder stringBuilder = new StringBuilder();
                     if (!TextUtils.isEmpty(filterName)) {
                         stringBuilder.append(filterName);
@@ -303,10 +285,10 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
                         stringBuilder.append(String.format("%sdBm", filterRssi + ""));
                         stringBuilder.append(";");
                     }
-                    tv_filter.setText(stringBuilder.toString());
+                    mBind.tvFilter.setText(stringBuilder.toString());
                 } else {
-                    rl_filter.setVisibility(View.GONE);
-                    rl_edit_filter.setVisibility(View.VISIBLE);
+                    mBind.rlFilter.setVisibility(View.GONE);
+                    mBind.rlEditFilter.setVisibility(View.VISIBLE);
                 }
                 if (isWindowLocked())
                     return;
@@ -330,8 +312,8 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
             mHandler.removeMessages(0);
             mokoBleScanner.stopScanDevice();
         }
-        rl_filter.setVisibility(View.GONE);
-        rl_edit_filter.setVisibility(View.VISIBLE);
+        mBind.rlFilter.setVisibility(View.GONE);
+        mBind.rlEditFilter.setVisibility(View.VISIBLE);
         filterName = "";
         filterRssi = -127;
         if (isWindowLocked())
@@ -359,7 +341,7 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
             isNeedPassword = advInfo.needPassword;
             if (!isNeedPassword) {
                 showLoadingProgressDialog();
-                ivRefresh.postDelayed(() -> LoRaLW005MokoSupport.getInstance().connDevice(advInfo.mac), 500);
+                mBind.ivRefresh.postDelayed(() -> LoRaLW005MokoSupport.getInstance().connDevice(advInfo.mac), 500);
                 return;
             }
             // show password
@@ -379,7 +361,7 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
                         mokoBleScanner.stopScanDevice();
                     }
                     showLoadingProgressDialog();
-                    ivRefresh.postDelayed(() -> LoRaLW005MokoSupport.getInstance().connDevice(advInfo.mac), 500);
+                    mBind.ivRefresh.postDelayed(() -> LoRaLW005MokoSupport.getInstance().connDevice(advInfo.mac), 500);
                 }
 
                 @Override
@@ -513,19 +495,6 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
                 }
             }
         }
-    }
-
-    private LoadingDialog mLoadingDialog;
-
-    private void showLoadingProgressDialog() {
-        mLoadingDialog = new LoadingDialog();
-        mLoadingDialog.show(getSupportFragmentManager());
-
-    }
-
-    private void dismissLoadingProgressDialog() {
-        if (mLoadingDialog != null)
-            mLoadingDialog.dismissAllowingStateLoss();
     }
 
     private LoadingMessageDialog mLoadingMessageDialog;

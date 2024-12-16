@@ -9,9 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -19,9 +16,8 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivityLoadStatusNotificationBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -36,28 +32,18 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class LoadStatusNotificationActivity extends BaseActivity {
 
 
-    @BindView(R2.id.iv_load_status)
-    ImageView ivLoadStatus;
-    @BindView(R2.id.cb_load_start_notification)
-    CheckBox cbLoadStartNotification;
-    @BindView(R2.id.cb_load_stop_notification)
-    CheckBox cbLoadStopNotification;
-    @BindView(R2.id.et_load_status_threshold)
-    EditText etLoadStatusThreshold;
+    private Lw005ActivityLoadStatusNotificationBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_load_status_notification);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityLoadStatusNotificationBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -117,7 +103,7 @@ public class LoadStatusNotificationActivity extends BaseActivity {
                                     case KEY_LOAD_STATUS:
                                         if (length > 0) {
                                             int enable = value[4] & 0xFF;
-                                            ivLoadStatus.setImageResource(enable == 1
+                                            mBind.ivLoadStatus.setImageResource(enable == 1
                                                     ? R.drawable.lw005_ic_load : R.drawable.lw005_ic_unload);
                                         }
                                         break;
@@ -168,14 +154,14 @@ public class LoadStatusNotificationActivity extends BaseActivity {
                                         if (length > 0) {
                                             int start = value[4] & 0xFF;
                                             int stop = value[5] & 0xFF;
-                                            cbLoadStartNotification.setChecked(start == 1);
-                                            cbLoadStopNotification.setChecked(stop == 1);
+                                            mBind.cbLoadStartNotification.setChecked(start == 1);
+                                            mBind.cbLoadStopNotification.setChecked(stop == 1);
                                         }
                                         break;
                                     case KEY_LOAD_STATUS_THRESHOLD:
                                         if (length > 0) {
                                             int threshold = value[4] & 0xFF;
-                                            etLoadStatusThreshold.setText(String.valueOf(threshold));
+                                            mBind.etLoadStatusThreshold.setText(String.valueOf(threshold));
                                         }
                                         break;
                                 }
@@ -213,20 +199,6 @@ public class LoadStatusNotificationActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();
@@ -260,7 +232,7 @@ public class LoadStatusNotificationActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String thresholdStr = etLoadStatusThreshold.getText().toString();
+        final String thresholdStr = mBind.etLoadStatusThreshold.getText().toString();
         if (TextUtils.isEmpty(thresholdStr))
             return false;
         final int threshold = Integer.parseInt(thresholdStr);
@@ -271,13 +243,13 @@ public class LoadStatusNotificationActivity extends BaseActivity {
     }
 
     private void saveParams() {
-        final String thresholdStr = etLoadStatusThreshold.getText().toString();
+        final String thresholdStr = mBind.etLoadStatusThreshold.getText().toString();
         final int threshold = Integer.parseInt(thresholdStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setLoadNotification(
-                cbLoadStartNotification.isChecked() ? 1 : 0,
-                cbLoadStopNotification.isChecked() ? 1 : 0));
+                mBind.cbLoadStartNotification.isChecked() ? 1 : 0,
+                mBind.cbLoadStopNotification.isChecked() ? 1 : 0));
         orderTasks.add(OrderTaskAssembler.setLoadStatusThreshold(threshold));
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }

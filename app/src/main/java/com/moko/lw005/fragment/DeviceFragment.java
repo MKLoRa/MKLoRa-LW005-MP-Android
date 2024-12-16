@@ -6,24 +6,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
 import com.moko.lw005.activity.DeviceInfoActivity;
+import com.moko.lw005.databinding.Lw005FragmentDeviceBinding;
 import com.moko.lw005.dialog.BottomDialog;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class DeviceFragment extends Fragment {
     private static final String TAG = DeviceFragment.class.getSimpleName();
-    @BindView(R2.id.tv_time_zone)
-    TextView tvTimeZone;
+    private Lw005FragmentDeviceBinding mBind;
     private ArrayList<String> mTimeZones;
     private int mSelectedTimeZone;
 //    private boolean mShutdownPayloadEnable;
@@ -45,8 +39,7 @@ public class DeviceFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.lw005_fragment_device, container, false);
-        ButterKnife.bind(this, view);
+        mBind = Lw005FragmentDeviceBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();
         mTimeZones = new ArrayList<>();
         for (int i = -24; i <= 28; i++) {
@@ -66,12 +59,12 @@ public class DeviceFragment extends Fragment {
                 }
             }
         }
-        return view;
+        return mBind.getRoot();
     }
 
     public void setTimeZone(int timeZone) {
         mSelectedTimeZone = timeZone + 24;
-        tvTimeZone.setText(mTimeZones.get(mSelectedTimeZone));
+        mBind.tvTimeZone.setText(mTimeZones.get(mSelectedTimeZone));
     }
 
     public void showTimeZoneDialog() {
@@ -79,7 +72,7 @@ public class DeviceFragment extends Fragment {
         dialog.setDatas(mTimeZones, mSelectedTimeZone);
         dialog.setListener(value -> {
             mSelectedTimeZone = value;
-            tvTimeZone.setText(mTimeZones.get(value));
+            mBind.tvTimeZone.setText(mTimeZones.get(value));
             activity.showSyncingProgressDialog();
             LoRaLW005MokoSupport.getInstance().sendOrder(OrderTaskAssembler.setTimezone(value - 24));
         });

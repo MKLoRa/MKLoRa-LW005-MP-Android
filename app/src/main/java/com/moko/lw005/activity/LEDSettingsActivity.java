@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.CheckBox;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -16,10 +15,8 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw005.AppConstants;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivityLedSettingsBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -33,16 +30,10 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class LEDSettingsActivity extends BaseActivity {
 
 
-    @BindView(R2.id.cb_network_indicator_status)
-    CheckBox cbNetworkIndicatorStatus;
-    @BindView(R2.id.cb_power_indicator_status)
-    CheckBox cbPowerIndicatorStatus;
+    private Lw005ActivityLedSettingsBinding mBind;
     private boolean mReceiverTag = false;
     private int deviceSpecification;
     private boolean savedParamsError;
@@ -50,8 +41,8 @@ public class LEDSettingsActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_led_settings);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityLedSettingsBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -134,8 +125,8 @@ public class LEDSettingsActivity extends BaseActivity {
                                         break;
                                     case KEY_LED_INDICATOR_STATUS:
                                         if (length > 0) {
-                                            cbPowerIndicatorStatus.setChecked(value[4] == 1);
-                                            cbNetworkIndicatorStatus.setChecked(value[5] == 1);
+                                            mBind.cbPowerIndicatorStatus.setChecked(value[4] == 1);
+                                            mBind.cbNetworkIndicatorStatus.setChecked(value[5] == 1);
                                         }
                                         break;
                                 }
@@ -172,20 +163,6 @@ public class LEDSettingsActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
     public void onBack(View view) {
         backHome();
     }
@@ -211,8 +188,8 @@ public class LEDSettingsActivity extends BaseActivity {
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
         orderTasks.add(OrderTaskAssembler.setLEDIndicatorStatus(
-                cbNetworkIndicatorStatus.isChecked() ? 1 : 0,
-                cbPowerIndicatorStatus.isChecked() ? 1 : 0));
+                mBind.cbNetworkIndicatorStatus.isChecked() ? 1 : 0,
+                mBind.cbPowerIndicatorStatus.isChecked() ? 1 : 0));
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
 
     }

@@ -9,18 +9,14 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
 import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
-import com.moko.ble.lib.utils.MokoUtils;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivityCountdownSettingsBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -32,25 +28,20 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 public class CountdownSettingsActivity extends BaseActivity {
 
 
-    @BindView(R2.id.et_countdown_report_interval)
-    EditText etCountdownReportInterval;
+    private Lw005ActivityCountdownSettingsBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_countdown_settings);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityCountdownSettingsBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -128,7 +119,7 @@ public class CountdownSettingsActivity extends BaseActivity {
                                     case KEY_COUNTDOWN_PAYLOADS_REPORT_INTERVAL:
                                         if (length > 0) {
                                             int interval = value[4] & 0xFF;
-                                            etCountdownReportInterval.setText(String.valueOf(interval));
+                                            mBind.etCountdownReportInterval.setText(String.valueOf(interval));
                                         }
                                         break;
                                 }
@@ -166,20 +157,6 @@ public class CountdownSettingsActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();
@@ -207,7 +184,7 @@ public class CountdownSettingsActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String intervalStr = etCountdownReportInterval.getText().toString();
+        final String intervalStr = mBind.etCountdownReportInterval.getText().toString();
         if (TextUtils.isEmpty(intervalStr))
             return false;
         final int interval = Integer.parseInt(intervalStr);
@@ -218,7 +195,7 @@ public class CountdownSettingsActivity extends BaseActivity {
     }
 
     private void saveParams() {
-        final String intervalStr = etCountdownReportInterval.getText().toString();
+        final String intervalStr = mBind.etCountdownReportInterval.getText().toString();
         final int interval = Integer.parseInt(intervalStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();

@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.elvishew.xlog.XLog;
@@ -24,10 +23,8 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.AppConstants;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivitySystemInfoBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.service.DfuService;
 import com.moko.lw005.utils.FileUtils;
 import com.moko.lw005.utils.ToastUtils;
@@ -47,8 +44,6 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import no.nordicsemi.android.dfu.DfuProgressListener;
 import no.nordicsemi.android.dfu.DfuProgressListenerAdapter;
 import no.nordicsemi.android.dfu.DfuServiceInitiator;
@@ -57,26 +52,15 @@ import no.nordicsemi.android.dfu.DfuServiceListenerHelper;
 public class SystemInfoActivity extends BaseActivity {
     public static final int REQUEST_CODE_SELECT_FIRMWARE = 0x10;
 
-    @BindView(R2.id.tv_software_version)
-    TextView tvSoftwareVersion;
-    @BindView(R2.id.tv_firmware_version)
-    TextView tvFirmwareVersion;
-    @BindView(R2.id.tv_hardware_version)
-    TextView tvHardwareVersion;
-    @BindView(R2.id.tv_mac_address)
-    TextView tvMacAddress;
-    @BindView(R2.id.tv_product_model)
-    TextView tvProductModel;
-    @BindView(R2.id.tv_manufacture)
-    TextView tvManufacture;
+    private Lw005ActivitySystemInfoBinding mBind;
     private boolean mReceiverTag = false;
     private String mDeviceMac;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_system_info);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivitySystemInfoBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         // 注册广播接收器
         IntentFilter filter = new IntentFilter();
@@ -127,23 +111,23 @@ public class SystemInfoActivity extends BaseActivity {
                 switch (orderCHAR) {
                     case CHAR_MODEL_NUMBER:
                         String productModel = new String(value);
-                        tvProductModel.setText(productModel);
+                        mBind.tvProductModel.setText(productModel);
                         break;
                     case CHAR_SOFTWARE_REVISION:
                         String softwareVersion = new String(value);
-                        tvSoftwareVersion.setText(softwareVersion);
+                        mBind.tvSoftwareVersion.setText(softwareVersion);
                         break;
                     case CHAR_FIRMWARE_REVISION:
                         String firmwareVersion = new String(value);
-                        tvFirmwareVersion.setText(firmwareVersion);
+                        mBind.tvFirmwareVersion.setText(firmwareVersion);
                         break;
                     case CHAR_HARDWARE_REVISION:
                         String hardwareVersion = new String(value);
-                        tvHardwareVersion.setText(hardwareVersion);
+                        mBind.tvHardwareVersion.setText(hardwareVersion);
                         break;
                     case CHAR_MANUFACTURER_NAME:
                         String manufacture = new String(value);
-                        tvManufacture.setText(manufacture);
+                        mBind.tvManufacture.setText(manufacture);
                         break;
                     case CHAR_CONTROL:
                         if (value.length >= 4) {
@@ -171,7 +155,7 @@ public class SystemInfoActivity extends BaseActivity {
                                             stringBuffer.insert(11, ":");
                                             stringBuffer.insert(14, ":");
                                             mDeviceMac = stringBuffer.toString().toUpperCase();
-                                            tvMacAddress.setText(mDeviceMac);
+                                            mBind.tvMacAddress.setText(mDeviceMac);
                                         }
                                         break;
                                 }
@@ -208,21 +192,6 @@ public class SystemInfoActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
     }
-
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();

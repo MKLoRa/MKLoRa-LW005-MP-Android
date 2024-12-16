@@ -2,26 +2,17 @@ package com.moko.lw005.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
 import com.moko.lw005.activity.DeviceInfoActivity;
-import com.moko.support.lw005.LoRaLW005MokoSupport;
-import com.moko.support.lw005.OrderTaskAssembler;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.moko.lw005.databinding.Lw005FragmentGeneralBinding;
 
 public class GeneralFragment extends Fragment {
     private static final String TAG = GeneralFragment.class.getSimpleName();
-
-
+    private Lw005FragmentGeneralBinding mBind;
 
     private DeviceInfoActivity activity;
 
@@ -38,9 +29,8 @@ public class GeneralFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.i(TAG, "onCreateView: ");
-        View view = inflater.inflate(R.layout.lw005_fragment_general, container, false);
-        ButterKnife.bind(this, view);
+        mBind = Lw005FragmentGeneralBinding.inflate(inflater, container, false);
         activity = (DeviceInfoActivity) getActivity();
-        return view;
+        return mBind.getRoot();
     }
 }

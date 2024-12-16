@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -19,10 +17,9 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.AppConstants;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivityAboutBinding;
+import com.moko.lw005.databinding.Lw005ActivityOverVoltageProtectionBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -37,18 +34,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class OverVoltageProtectionActivity extends BaseActivity {
 
 
-    @BindView(R2.id.cb_over_voltage_protection)
-    CheckBox cbOverVoltageProtection;
-    @BindView(R2.id.et_over_voltage_threshold)
-    EditText etOverVoltageThreshold;
-    @BindView(R2.id.et_time_threshold)
-    EditText etTimeThreshold;
+    private Lw005ActivityOverVoltageProtectionBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private int deviceSpecification;
@@ -56,8 +45,8 @@ public class OverVoltageProtectionActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_over_voltage_protection);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityOverVoltageProtectionBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         deviceSpecification = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_SPECIFICATION, 0);
         // 注册广播接收器
@@ -135,11 +124,11 @@ public class OverVoltageProtectionActivity extends BaseActivity {
                                 switch (configKeyEnum) {
                                     case KEY_OVER_VOLTAGE_PROTECTION:
                                         if (length > 0) {
-                                            cbOverVoltageProtection.setChecked(value[4] == 1);
+                                            mBind.cbOverVoltageProtection.setChecked(value[4] == 1);
                                             byte[] overVoltageBytes = Arrays.copyOfRange(value, 5, 7);
                                             int overVoltage = MokoUtils.toInt(overVoltageBytes);
-                                            etOverVoltageThreshold.setText(String.valueOf(overVoltage));
-                                            etTimeThreshold.setText(String.valueOf(value[7] & 0xFF));
+                                            mBind.etOverVoltageThreshold.setText(String.valueOf(overVoltage));
+                                            mBind.etTimeThreshold.setText(String.valueOf(value[7] & 0xFF));
                                         }
                                         break;
                                 }
@@ -177,20 +166,6 @@ public class OverVoltageProtectionActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();
@@ -224,7 +199,7 @@ public class OverVoltageProtectionActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String overVoltageStr = etOverVoltageThreshold.getText().toString();
+        final String overVoltageStr = mBind.etOverVoltageThreshold.getText().toString();
         if (TextUtils.isEmpty(overVoltageStr))
             return false;
         final int overVoltage = Integer.parseInt(overVoltageStr);
@@ -236,7 +211,7 @@ public class OverVoltageProtectionActivity extends BaseActivity {
         }
         if (overVoltage < min || overVoltage > max)
             return false;
-        final String timeStr = etTimeThreshold.getText().toString();
+        final String timeStr = mBind.etTimeThreshold.getText().toString();
         if (TextUtils.isEmpty(timeStr))
             return false;
         final int time = Integer.parseInt(timeStr);
@@ -247,13 +222,13 @@ public class OverVoltageProtectionActivity extends BaseActivity {
     }
 
     private void saveParams() {
-        final String overVoltageStr = etOverVoltageThreshold.getText().toString();
+        final String overVoltageStr = mBind.etOverVoltageThreshold.getText().toString();
         final int overVoltage = Integer.parseInt(overVoltageStr);
-        final String timeStr = etTimeThreshold.getText().toString();
+        final String timeStr = mBind.etTimeThreshold.getText().toString();
         final int time = Integer.parseInt(timeStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setOverVoltageProtection(cbOverVoltageProtection.isChecked() ? 1 : 0, overVoltage, time));
+        orderTasks.add(OrderTaskAssembler.setOverVoltageProtection(mBind.cbOverVoltageProtection.isChecked() ? 1 : 0, overVoltage, time));
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 }

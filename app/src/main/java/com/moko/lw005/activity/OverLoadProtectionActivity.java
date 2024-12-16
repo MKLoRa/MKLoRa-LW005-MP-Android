@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -19,10 +17,9 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.AppConstants;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivityAboutBinding;
+import com.moko.lw005.databinding.Lw005ActivityOverLoadProtectionBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -37,18 +34,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class OverLoadProtectionActivity extends BaseActivity {
 
 
-    @BindView(R2.id.cb_over_load_protection)
-    CheckBox cbOverLoadProtection;
-    @BindView(R2.id.et_over_load_threshold)
-    EditText etOverLoadThreshold;
-    @BindView(R2.id.et_time_threshold)
-    EditText etTimeThreshold;
+    private Lw005ActivityOverLoadProtectionBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private int deviceSpecification;
@@ -56,8 +45,8 @@ public class OverLoadProtectionActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_over_load_protection);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityOverLoadProtectionBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         deviceSpecification = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_SPECIFICATION, 0);
         // 注册广播接收器
@@ -135,11 +124,11 @@ public class OverLoadProtectionActivity extends BaseActivity {
                                 switch (configKeyEnum) {
                                     case KEY_OVER_LOAD_PROTECTION:
                                         if (length > 0) {
-                                            cbOverLoadProtection.setChecked(value[4] == 1);
+                                            mBind.cbOverLoadProtection.setChecked(value[4] == 1);
                                             byte[] overLoadBytes = Arrays.copyOfRange(value, 5, 7);
                                             int overLoad = MokoUtils.toInt(overLoadBytes);
-                                            etOverLoadThreshold.setText(String.valueOf(overLoad));
-                                            etTimeThreshold.setText(String.valueOf(value[7] & 0xFF));
+                                            mBind.etOverLoadThreshold.setText(String.valueOf(overLoad));
+                                            mBind.etTimeThreshold.setText(String.valueOf(value[7] & 0xFF));
                                         }
                                         break;
                                 }
@@ -177,20 +166,6 @@ public class OverLoadProtectionActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();
@@ -224,7 +199,7 @@ public class OverLoadProtectionActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String overLoadStr = etOverLoadThreshold.getText().toString();
+        final String overLoadStr = mBind.etOverLoadThreshold.getText().toString();
         if (TextUtils.isEmpty(overLoadStr))
             return false;
         final int overLoad = Integer.parseInt(overLoadStr);
@@ -237,7 +212,7 @@ public class OverLoadProtectionActivity extends BaseActivity {
         }
         if (overLoad < 10 || overLoad > max)
             return false;
-        final String timeStr = etTimeThreshold.getText().toString();
+        final String timeStr = mBind.etTimeThreshold.getText().toString();
         if (TextUtils.isEmpty(timeStr))
             return false;
         final int time = Integer.parseInt(timeStr);
@@ -248,13 +223,13 @@ public class OverLoadProtectionActivity extends BaseActivity {
     }
 
     private void saveParams() {
-        final String overLoadStr = etOverLoadThreshold.getText().toString();
+        final String overLoadStr = mBind.etOverLoadThreshold.getText().toString();
         final int overLoad = Integer.parseInt(overLoadStr);
-        final String timeStr = etTimeThreshold.getText().toString();
+        final String timeStr = mBind.etTimeThreshold.getText().toString();
         final int time = Integer.parseInt(timeStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setOverLoadProtection(cbOverLoadProtection.isChecked() ? 1 : 0, overLoad, time));
+        orderTasks.add(OrderTaskAssembler.setOverLoadProtection(mBind.cbOverLoadProtection.isChecked() ? 1 : 0, overLoad, time));
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 }

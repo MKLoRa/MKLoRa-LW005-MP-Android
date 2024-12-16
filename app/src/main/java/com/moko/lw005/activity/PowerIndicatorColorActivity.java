@@ -9,9 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -20,11 +17,9 @@ import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.lw005.AppConstants;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivityPowerIndicatorColorSettingsBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
 import com.moko.lw005.dialog.BottomDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -39,28 +34,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class PowerIndicatorColorActivity extends BaseActivity {
 
 
-    @BindView(R2.id.tv_power_indicator_color_type)
-    TextView tvPowerIndicatorColorType;
-    @BindView(R2.id.et_blue)
-    EditText etBlue;
-    @BindView(R2.id.et_green)
-    EditText etGreen;
-    @BindView(R2.id.et_yellow)
-    EditText etYellow;
-    @BindView(R2.id.et_orange)
-    EditText etOrange;
-    @BindView(R2.id.et_red)
-    EditText etRed;
-    @BindView(R2.id.et_purple)
-    EditText etPurple;
-    @BindView(R2.id.ll_color_settings)
-    LinearLayout llColorSettings;
+    private Lw005ActivityPowerIndicatorColorSettingsBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private int deviceSpecification;
@@ -70,8 +47,8 @@ public class PowerIndicatorColorActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_power_indicator_color_settings);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivityPowerIndicatorColorSettingsBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         deviceSpecification = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_SPECIFICATION, 0);
         mValues = new ArrayList<>();
         mValues.add("Active power indicator with color direct transition");
@@ -160,30 +137,30 @@ public class PowerIndicatorColorActivity extends BaseActivity {
                                     case KEY_POWER_INDICATOR_COLOR:
                                         if (length > 0) {
                                             mSelected = value[4] & 0xFF;
-                                            tvPowerIndicatorColorType.setText(mValues.get(mSelected));
+                                            mBind.tvPowerIndicatorColorType.setText(mValues.get(mSelected));
                                             if (mSelected > 1) {
-                                                llColorSettings.setVisibility(View.GONE);
+                                                mBind.llColorSettings.setVisibility(View.GONE);
                                             } else {
-                                                llColorSettings.setVisibility(View.VISIBLE);
+                                                mBind.llColorSettings.setVisibility(View.VISIBLE);
                                             }
                                             byte[] blueBytes = Arrays.copyOfRange(value, 5, 7);
                                             int blue = MokoUtils.toInt(blueBytes);
-                                            etBlue.setText(String.valueOf(blue));
+                                            mBind.etBlue.setText(String.valueOf(blue));
                                             byte[] greenBytes = Arrays.copyOfRange(value, 7, 9);
                                             int green = MokoUtils.toInt(greenBytes);
-                                            etGreen.setText(String.valueOf(green));
+                                            mBind.etGreen.setText(String.valueOf(green));
                                             byte[] yellowBytes = Arrays.copyOfRange(value, 9, 11);
                                             int yellow = MokoUtils.toInt(yellowBytes);
-                                            etYellow.setText(String.valueOf(yellow));
+                                            mBind.etYellow.setText(String.valueOf(yellow));
                                             byte[] orangeBytes = Arrays.copyOfRange(value, 11, 13);
                                             int orange = MokoUtils.toInt(orangeBytes);
-                                            etOrange.setText(String.valueOf(orange));
+                                            mBind.etOrange.setText(String.valueOf(orange));
                                             byte[] redBytes = Arrays.copyOfRange(value, 13, 15);
                                             int red = MokoUtils.toInt(redBytes);
-                                            etRed.setText(String.valueOf(red));
+                                            mBind.etRed.setText(String.valueOf(red));
                                             byte[] purpleBytes = Arrays.copyOfRange(value, 15, 17);
                                             int purple = MokoUtils.toInt(purpleBytes);
-                                            etPurple.setText(String.valueOf(purple));
+                                            mBind.etPurple.setText(String.valueOf(purple));
                                         }
                                         break;
 
@@ -222,20 +199,6 @@ public class PowerIndicatorColorActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();
@@ -269,12 +232,12 @@ public class PowerIndicatorColorActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String blue = etBlue.getText().toString();
-        final String green = etGreen.getText().toString();
-        final String yellow = etYellow.getText().toString();
-        final String orange = etOrange.getText().toString();
-        final String red = etRed.getText().toString();
-        final String purple = etPurple.getText().toString();
+        final String blue = mBind.etBlue.getText().toString();
+        final String green = mBind.etGreen.getText().toString();
+        final String yellow = mBind.etYellow.getText().toString();
+        final String orange = mBind.etOrange.getText().toString();
+        final String red = mBind.etRed.getText().toString();
+        final String purple = mBind.etPurple.getText().toString();
         if (TextUtils.isEmpty(blue) || TextUtils.isEmpty(green) || TextUtils.isEmpty(yellow)
                 || TextUtils.isEmpty(orange) || TextUtils.isEmpty(red) || TextUtils.isEmpty(purple)) {
             return false;
@@ -320,12 +283,12 @@ public class PowerIndicatorColorActivity extends BaseActivity {
 
     private void saveParams() {
 
-        final String blue = etBlue.getText().toString();
-        final String green = etGreen.getText().toString();
-        final String yellow = etYellow.getText().toString();
-        final String orange = etOrange.getText().toString();
-        final String red = etRed.getText().toString();
-        final String purple = etPurple.getText().toString();
+        final String blue = mBind.etBlue.getText().toString();
+        final String green = mBind.etGreen.getText().toString();
+        final String yellow = mBind.etYellow.getText().toString();
+        final String orange = mBind.etOrange.getText().toString();
+        final String red = mBind.etRed.getText().toString();
+        final String purple = mBind.etPurple.getText().toString();
         final int blueValue = Integer.parseInt(blue);
         final int greenValue = Integer.parseInt(green);
         final int yellowValue = Integer.parseInt(yellow);
@@ -347,11 +310,11 @@ public class PowerIndicatorColorActivity extends BaseActivity {
         dialog.setDatas(mValues, mSelected);
         dialog.setListener(value -> {
             mSelected = value;
-            tvPowerIndicatorColorType.setText(mValues.get(value));
+            mBind.tvPowerIndicatorColorType.setText(mValues.get(value));
             if (value > 1) {
-                llColorSettings.setVisibility(View.GONE);
+                mBind.llColorSettings.setVisibility(View.GONE);
             } else {
-                llColorSettings.setVisibility(View.VISIBLE);
+                mBind.llColorSettings.setVisibility(View.VISIBLE);
             }
         });
         dialog.show(getSupportFragmentManager());

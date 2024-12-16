@@ -9,8 +9,6 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.EditText;
 
 import com.moko.ble.lib.MokoConstants;
 import com.moko.ble.lib.event.ConnectStatusEvent;
@@ -18,10 +16,8 @@ import com.moko.ble.lib.event.OrderTaskResponseEvent;
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.task.OrderTaskResponse;
 import com.moko.lw005.AppConstants;
-import com.moko.lw005.R;
-import com.moko.lw005.R2;
+import com.moko.lw005.databinding.Lw005ActivitySagVoltageProtectionBinding;
 import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
 import com.moko.lw005.utils.ToastUtils;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
@@ -35,18 +31,10 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class SagVoltageProtectionActivity extends BaseActivity {
 
 
-    @BindView(R2.id.cb_sag_voltage_protection)
-    CheckBox cbSagVoltageProtection;
-    @BindView(R2.id.et_sag_voltage_threshold)
-    EditText etSagVoltageThreshold;
-    @BindView(R2.id.et_time_threshold)
-    EditText etTimeThreshold;
+    private Lw005ActivitySagVoltageProtectionBinding mBind;
     private boolean mReceiverTag = false;
     private boolean savedParamsError;
     private int deviceSpecification;
@@ -54,8 +42,8 @@ public class SagVoltageProtectionActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.lw005_activity_sag_voltage_protection);
-        ButterKnife.bind(this);
+        mBind = Lw005ActivitySagVoltageProtectionBinding.inflate(getLayoutInflater());
+        setContentView(mBind.getRoot());
         EventBus.getDefault().register(this);
         deviceSpecification = getIntent().getIntExtra(AppConstants.EXTRA_KEY_DEVICE_SPECIFICATION, 0);
         // 注册广播接收器
@@ -133,10 +121,10 @@ public class SagVoltageProtectionActivity extends BaseActivity {
                                 switch (configKeyEnum) {
                                     case KEY_SAG_VOLTAGE_PROTECTION:
                                         if (length > 0) {
-                                            cbSagVoltageProtection.setChecked(value[4] == 1);
+                                            mBind.cbSagVoltageProtection.setChecked(value[4] == 1);
                                             int sagVoltage = value[5] & 0xFF;
-                                            etSagVoltageThreshold.setText(String.valueOf(sagVoltage));
-                                            etTimeThreshold.setText(String.valueOf(value[6] & 0xFF));
+                                            mBind.etSagVoltageThreshold.setText(String.valueOf(sagVoltage));
+                                            mBind.etTimeThreshold.setText(String.valueOf(value[6] & 0xFF));
                                         }
                                         break;
                                 }
@@ -174,20 +162,6 @@ public class SagVoltageProtectionActivity extends BaseActivity {
         super.onDestroy();
     }
 
-    private LoadingMessageDialog mLoadingMessageDialog;
-
-    public void showSyncingProgressDialog() {
-        mLoadingMessageDialog = new LoadingMessageDialog();
-        mLoadingMessageDialog.setMessage("Syncing..");
-        mLoadingMessageDialog.show(getSupportFragmentManager());
-
-    }
-
-    public void dismissSyncProgressDialog() {
-        if (mLoadingMessageDialog != null)
-            mLoadingMessageDialog.dismissAllowingStateLoss();
-    }
-
 
     public void onBack(View view) {
         backHome();
@@ -221,7 +195,7 @@ public class SagVoltageProtectionActivity extends BaseActivity {
     }
 
     private boolean isValid() {
-        final String sagVoltageStr = etSagVoltageThreshold.getText().toString();
+        final String sagVoltageStr = mBind.etSagVoltageThreshold.getText().toString();
         if (TextUtils.isEmpty(sagVoltageStr))
             return false;
         final int sagVoltage = Integer.parseInt(sagVoltageStr);
@@ -233,7 +207,7 @@ public class SagVoltageProtectionActivity extends BaseActivity {
         }
         if (sagVoltage < min || sagVoltage > max)
             return false;
-        final String timeStr = etTimeThreshold.getText().toString();
+        final String timeStr = mBind.etTimeThreshold.getText().toString();
         if (TextUtils.isEmpty(timeStr))
             return false;
         final int time = Integer.parseInt(timeStr);
@@ -244,13 +218,13 @@ public class SagVoltageProtectionActivity extends BaseActivity {
     }
 
     private void saveParams() {
-        final String sagVoltageStr = etSagVoltageThreshold.getText().toString();
+        final String sagVoltageStr = mBind.etSagVoltageThreshold.getText().toString();
         final int sagVoltage = Integer.parseInt(sagVoltageStr);
-        final String timeStr = etTimeThreshold.getText().toString();
+        final String timeStr = mBind.etTimeThreshold.getText().toString();
         final int time = Integer.parseInt(timeStr);
         savedParamsError = false;
         List<OrderTask> orderTasks = new ArrayList<>();
-        orderTasks.add(OrderTaskAssembler.setSagVoltageProtection(cbSagVoltageProtection.isChecked() ? 1 : 0, sagVoltage, time));
+        orderTasks.add(OrderTaskAssembler.setSagVoltageProtection(mBind.cbSagVoltageProtection.isChecked() ? 1 : 0, sagVoltage, time));
         LoRaLW005MokoSupport.getInstance().sendOrder(orderTasks.toArray(new OrderTask[]{}));
     }
 }
