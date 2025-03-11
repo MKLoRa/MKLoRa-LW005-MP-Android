@@ -234,7 +234,6 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().unregister(this);
     }
 
     private void backHome() {
@@ -248,6 +247,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
                 startActivity(intent);
                 return;
             }
+            EventBus.getDefault().unregister(this);
             finish();
         }
     }
@@ -272,7 +272,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
                     return;
                 }
                 if (isBack)
-                    finish();
+                    backHome();
             });
             dialog.show(getSupportFragmentManager());
             return;
@@ -288,7 +288,7 @@ public class LogDataActivity extends BaseActivity implements BaseQuickAdapter.On
         LogDatas.add(LogData);
         adapter.replaceData(LogDatas);
         if (isBack)
-            finish();
+            backHome();
     }
 
     @Override
