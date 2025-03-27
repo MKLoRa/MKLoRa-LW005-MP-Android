@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 
 import com.moko.lw005.activity.DeviceInfoActivity;
 import com.moko.lw005.databinding.Lw005FragmentDeviceBinding;
-import com.moko.lw005.dialog.BottomDialog;
+import com.moko.lib.loraui.dialog.BottomDialog;
 import com.moko.support.lw005.LoRaLW005MokoSupport;
 import com.moko.support.lw005.OrderTaskAssembler;
 

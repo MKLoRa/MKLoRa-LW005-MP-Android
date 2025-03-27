@@ -27,10 +27,10 @@ import com.moko.lw005.BuildConfig;
 import com.moko.lw005.R;
 import com.moko.lw005.adapter.DeviceListAdapter;
 import com.moko.lw005.databinding.Lw005ActivityMainBinding;
-import com.moko.lw005.dialog.AlertMessageDialog;
-import com.moko.lw005.dialog.LoadingMessageDialog;
-import com.moko.lw005.dialog.PasswordDialog;
-import com.moko.lw005.dialog.ScanFilterDialog;
+import com.moko.lib.loraui.dialog.AlertMessageDialog;
+import com.moko.lib.loraui.dialog.LoadingMessageDialog;
+import com.moko.lib.loraui.dialog.PasswordDialog;
+import com.moko.lib.loraui.dialog.ScanFilterDialog;
 import com.moko.lw005.entity.AdvInfo;
 import com.moko.lw005.utils.BeaconInfoParseableImpl;
 import com.moko.lw005.utils.SPUtiles;
@@ -101,7 +101,7 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
         adapter.openLoadAnimation();
         mBind.rvDevices.setLayoutManager(new LinearLayoutManager(this));
         DividerItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
-        itemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.lw005_shape_recycleview_divider));
+        itemDecoration.setDrawable(ContextCompat.getDrawable(this, R.drawable.shape_recycleview_divider));
         mBind.rvDevices.addItemDecoration(itemDecoration);
         mBind.rvDevices.setAdapter(adapter);
         mHandler = new Handler(Looper.getMainLooper());
@@ -125,7 +125,7 @@ public class LoRaLW005MainActivity extends BaseActivity implements MokoScanDevic
             LoRaLW005MokoSupport.getInstance().enableBluetooth();
             return;
         }
-        animation = AnimationUtils.loadAnimation(this, R.anim.lw005_rotate_refresh);
+        animation = AnimationUtils.loadAnimation(this, R.anim.rotate_refresh);
         mBind.ivRefresh.startAnimation(animation);
         beaconInfoParseable = new BeaconInfoParseableImpl();
         mokoBleScanner.startScanDevice(this);
