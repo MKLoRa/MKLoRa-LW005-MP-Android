@@ -18,7 +18,6 @@ import com.moko.support.lw005.handler.MokoCharacteristicHandler;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 

@@ -1,13 +1,9 @@
 package com.moko.support.lw005.task;
 
-import android.text.TextUtils;
-
 import com.moko.ble.lib.task.OrderTask;
 import com.moko.ble.lib.utils.MokoUtils;
 import com.moko.support.lw005.entity.OrderCHAR;
 import com.moko.support.lw005.entity.ParamsKeyEnum;
-
-import java.util.ArrayList;
 
 import androidx.annotation.IntRange;
 

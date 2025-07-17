@@ -31,7 +31,6 @@ import com.moko.lib.loraiot.dialog.LogoutDialog;
 import com.moko.lib.loraiot.entity.CommonResp;
 import com.moko.lib.loraiot.entity.LoginEntity;
 import com.moko.lib.loraui.dialog.BottomDialog;
-import com.moko.lw005.AppConstants;
 import com.moko.lw005.R;
 import com.moko.lw005.databinding.Lw005ActivityConnSettingBinding;
 import com.moko.lw005.utils.SPUtiles;
