@@ -140,14 +140,10 @@ public class EnergySettingsActivity extends BaseActivity {
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_ENERGY_CONFIG_INTERVAL:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         break;
                                     case KEY_POWER_CHANGE_VALUE:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         if (savedParamsError) {
                                             ToastUtils.showToast(EnergySettingsActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                         } else {

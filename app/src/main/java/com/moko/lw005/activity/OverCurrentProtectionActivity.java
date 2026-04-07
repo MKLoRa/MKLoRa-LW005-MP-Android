@@ -101,9 +101,7 @@ public class OverCurrentProtectionActivity extends BaseActivity {
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_OVER_CURRENT_PROTECTION:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         if (savedParamsError) {
                                             ToastUtils.showToast(OverCurrentProtectionActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                         } else {

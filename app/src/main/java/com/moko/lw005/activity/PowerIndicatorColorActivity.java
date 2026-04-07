@@ -116,9 +116,7 @@ public class PowerIndicatorColorActivity extends BaseActivity {
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_POWER_INDICATOR_COLOR:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         if (savedParamsError) {
                                             ToastUtils.showToast(PowerIndicatorColorActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                         } else {

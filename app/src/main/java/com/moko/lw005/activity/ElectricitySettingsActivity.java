@@ -106,9 +106,7 @@ public class ElectricitySettingsActivity extends BaseActivity {
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_ELECTRICITY_PAYLOADS_REPORT_INTERVAL:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         if (savedParamsError) {
                                             ToastUtils.showToast(ElectricitySettingsActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                         } else {

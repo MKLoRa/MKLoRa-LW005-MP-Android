@@ -127,14 +127,10 @@ public class LoadStatusNotificationActivity extends BaseActivity {
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_LOAD_NOTIFICATION:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         break;
                                     case KEY_LOAD_STATUS_THRESHOLD:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         if (savedParamsError) {
                                             ToastUtils.showToast(LoadStatusNotificationActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                         } else {

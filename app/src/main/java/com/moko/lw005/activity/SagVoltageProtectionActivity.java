@@ -101,9 +101,7 @@ public class SagVoltageProtectionActivity extends BaseActivity {
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_SAG_VOLTAGE_PROTECTION:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         if (savedParamsError) {
                                             ToastUtils.showToast(SagVoltageProtectionActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                         } else {

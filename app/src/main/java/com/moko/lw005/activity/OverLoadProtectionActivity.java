@@ -103,9 +103,7 @@ public class OverLoadProtectionActivity extends BaseActivity {
                                 int result = value[4] & 0xFF;
                                 switch (configKeyEnum) {
                                     case KEY_OVER_LOAD_PROTECTION:
-                                        if (result != 1) {
-                                            savedParamsError = true;
-                                        }
+                                        savedParamsError |= result != 1;
                                         if (savedParamsError) {
                                             ToastUtils.showToast(OverLoadProtectionActivity.this, "Opps！Save failed. Please check the input characters and try again.");
                                         } else {
